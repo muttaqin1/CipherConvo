@@ -1,0 +1,8 @@
+dist/
+node_modules/
+logs/
+keys/
+tsconfig.tsbuildinfo
+.env
+.vim/
+.plans.txt
