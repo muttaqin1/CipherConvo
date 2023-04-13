@@ -13,3 +13,13 @@ export const databaseName = process.env.DATABASE_NAME || 'mysql';
 export const databaseUser = process.env.DATABASE_USER || 'root';
 export const databasePassword = process.env.DATABASE_PASSWORD || '11111111';
 export const database = process.env.DATABASE || 'chat-application';
+export const JWT = {
+  aud: process.env.JWT_AUD || 'audience',
+  sub: process.env.JWT_SUB || 'subject',
+  iss: process.env.JWT_ISS || 'issuer.com',
+  accessTokenExpiry:
+    Number(process.env.JWT_ACCESS_TOKEN_EXPIRY) || 1000 * 60 * 10,
+  refreshTokenExpiry:
+    Number(process.env.JWT_REFRESH_TOKEN_EXPIRY) || 1000 * 60 * 60 * 24 * 30
+} as const;
+export const corsURL = process.env.CORS_URL || 'http://localhost:3000';
