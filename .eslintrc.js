@@ -19,6 +19,7 @@ module.exports = {
   plugins: ['prettier'],
   rules: {
     'class-methods-use-this': 'off',
+    'import/prefer-default-export': 'off',
     'max-classes-per-file': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',

@@ -7,7 +7,7 @@ const stream: StreamOptions = {
   write: (message) => Logger.http(message)
 };
 
-export default morgan(
+export const Morgan = morgan(
   ':method :url :status :res[content-length] - :response-time ms',
   { stream, skip: IsProduction }
 );

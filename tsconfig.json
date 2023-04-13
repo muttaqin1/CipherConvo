@@ -14,16 +14,18 @@
     "incremental": true,
     "strict": true,
     "moduleResolution": "node",
+    "types": ["reflect-metadata"],
     "paths": {
       "@helpers/*": ["helpers/*"],
-      "@config/*": ["config/*"],
       "@constants/*": ["constants/*"],
-      "@decorators/*": ["decorators/*"],
+      "@config/*": ["config/*"],
+      "@database/*": ["database/*"],
       "@auth/*": ["auth/*"],
       "@interfaces/*": ["interfaces/*"],
       "@middlewares/*": ["api/middlewares/*"],
       "@controllers/*": ["api/controllers/*"],
-      "@routes/*": ["api/routes/*"],
+      "@models/*": ["api/models/*"],
+      "@services/*": ["api/services/*"],
       "@repositories/*": ["api/repositories/*"]
     },
     "esModuleInterop": true,
@@ -42,5 +44,6 @@
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*.ts", "src/**/*.test.ts"]
+  "include": ["src/**/*.ts", "src/**/*.test.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.spec.ts"]
 }

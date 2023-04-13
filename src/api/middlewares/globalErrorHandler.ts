@@ -6,7 +6,7 @@ import Logger from '@helpers/Logger';
 import ApiErrorResponse from '@helpers/ApiResponse/ApiErrorResponse';
 import ApiSuccessResponse from '@helpers/ApiResponse/ApiSuccessResponse';
 
-export default (
+export const globalErrorHandler = (
   err: any,
   _req: Request,
   res: Response,
