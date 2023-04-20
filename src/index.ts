@@ -15,6 +15,12 @@ import {
 } from '@middlewares/index';
 import { sequelize } from '@database/index';
 
+// handle uncaughtException and exit the application with code 1.
+process.on('uncaughtException', (err) => {
+  Logger.error(err);
+  process.exit(1);
+});
+
 const expressApp = express();
 expressApp.use(express.json());
 expressApp.use((req, _, next) => {
@@ -55,4 +61,10 @@ sequelize.authenticate({ logging: false }).then(() => {
 });
 app.listen(3000, () => {
   Logger.info('Server is running on port 3000');
+});
+
+// handle unhandledRejection and exit the application with code 1.
+process.on('unhandledRejection', (err) => {
+  Logger.error(err);
+  process.exit(1);
 });
