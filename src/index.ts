@@ -59,7 +59,7 @@ sequelize.authenticate({ logging: false }).then(() => {
     Logger.info('Database is synced');
   });
 });
-app.listen(3000, () => {
+const expServer = app.listen(3000, () => {
   Logger.info('Server is running on port 3000');
 });
 
@@ -67,4 +67,21 @@ app.listen(3000, () => {
 process.on('unhandledRejection', (err) => {
   Logger.error(err);
   process.exit(1);
+});
+
+// handle graceful shutdown of the application and close the database connection.
+process.on('SIGTERM', () => {
+  expServer.close(async () => {
+    await sequelize.close();
+    Logger.info('Process terminated');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  expServer.close(async () => {
+    await sequelize.close();
+    Logger.info('Process terminated');
+    process.exit(0);
+  });
 });
