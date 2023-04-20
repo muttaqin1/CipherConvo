@@ -8,6 +8,7 @@ export const sequelize = new Sequelize({
   port: dbConfig.PORT,
   database: dbConfig.database,
   dialect: dbConfig.DIALECT as Dialect,
+  logging: false,
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,

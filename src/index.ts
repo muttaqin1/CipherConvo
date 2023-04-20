@@ -14,10 +14,12 @@ import {
   shouldCompress
 } from '@middlewares/index';
 import { sequelize } from '@database/index';
+import syncDatabase from '@database/syncTables';
+import '@middlewares/notFoundHandler';
 
 // handle uncaughtException and exit the application with code 1.
 process.on('uncaughtException', (err) => {
-  Logger.error(err);
+  Logger.error(`Uncaught Exception ${err}`);
   process.exit(1);
 });
 
@@ -51,21 +53,28 @@ const server = new InversifyExpressServer(
   expressApp
 );
 server.setErrorConfig((app) => app.use(globalErrorHandler));
-
 const app = server.build();
-sequelize.authenticate({ logging: false }).then(() => {
-  Logger.info('Database is connected');
-  sequelize.sync({ force: false, logging: false }).then(() => {
-    Logger.info('Database is synced');
+sequelize
+  .authenticate({ logging: false })
+  .then(() => {
+    Logger.info('Database is connected');
+    syncDatabase()
+      .then(() => {
+        Logger.info('Database is synced');
+      })
+      .catch((err) => {
+        Logger.error('Unable to sync the database:', err);
+      });
+  })
+  .catch((err) => {
+    Logger.error('Unable to connect to the database:', err);
   });
-});
 const expServer = app.listen(3000, () => {
   Logger.info('Server is running on port 3000');
 });
-
 // handle unhandledRejection and exit the application with code 1.
 process.on('unhandledRejection', (err) => {
-  Logger.error(err);
+  Logger.error(`Unhandled Rejection ${err}`);
   process.exit(1);
 });
 
@@ -73,7 +82,7 @@ process.on('unhandledRejection', (err) => {
 process.on('SIGTERM', () => {
   expServer.close(async () => {
     await sequelize.close();
-    Logger.info('Process terminated');
+    Logger.info('Process terminated with SIGTERM signal.');
     process.exit(0);
   });
 });
@@ -81,7 +90,7 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   expServer.close(async () => {
     await sequelize.close();
-    Logger.info('Process terminated');
+    Logger.info('Process terminated with SIGINT signal.');
     process.exit(0);
   });
 });

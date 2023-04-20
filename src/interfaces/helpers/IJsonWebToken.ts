@@ -1,4 +1,3 @@
-import { Encoding } from 'crypto';
 import { JwtPayload } from 'jsonwebtoken';
 
 export default interface IJsonWebToken {
