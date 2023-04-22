@@ -9,7 +9,6 @@ import {
 import { Encoding } from 'crypto';
 import { readFile } from 'fs/promises';
 import {
-  JwtPayload,
   sign,
   verify,
   TokenExpiredError,
@@ -20,6 +19,7 @@ import { promisify } from 'util';
 import Logger from '@helpers/Logger';
 import IJsonWebToken from '@interfaces/helpers/IJsonWebToken';
 import { injectable } from 'inversify';
+import JwtPayload from '@interfaces/auth/JwtPayload';
 
 const IsJsonWebTokenError = (err: unknown): err is JsonWebTokenError =>
   err instanceof JsonWebTokenError;
@@ -55,7 +55,7 @@ export default class Jwt implements IJsonWebToken {
   public async generateToken(payload: JwtPayload): Promise<string> {
     try {
       const privateKey = await this.readPrivateKey('utf8');
-      if (!privateKey) throw new InternalServerError('Error Reading Key');
+      if (!privateKey) throw new InternalServerError();
       // @ts-ignore
       const token = promisify(sign)(payload, privateKey, {
         algorithm: 'RS256'
@@ -68,7 +68,7 @@ export default class Jwt implements IJsonWebToken {
         throw new InternalServerError();
       }
       // without checking IsApiError we can not use err.message property;
-      if (IsApiError(err)) throw new InternalServerError(err.message);
+      if (IsApiError(err)) throw err;
       else throw new InternalServerError();
     }
   }
@@ -76,11 +76,10 @@ export default class Jwt implements IJsonWebToken {
   public async verifyToken(token: string): Promise<JwtPayload> {
     try {
       const publicKey = await this.readPublicKey('utf8');
-      if (!publicKey) throw new InternalServerError('Error Reading Key');
+      if (!publicKey) throw new InternalServerError();
       // @ts-ignore
       const payload = (await promisify(verify)(token, publicKey)) as JwtPayload;
-      if (payload) return payload;
-      throw new InternalServerError('Failed To Validate Token');
+      return payload;
     } catch (err) {
       if (IsJsonWebTokenError(err)) {
         if (
@@ -88,18 +87,17 @@ export default class Jwt implements IJsonWebToken {
           err instanceof TokenExpiredError &&
           err.name === 'TokenExpiredError'
         )
-          throw new _TokenExpiredError(`Token Expired At: ${err.expiredAt}`);
+          throw new _TokenExpiredError();
         else if (
           err &&
           err instanceof NotBeforeError &&
           err.name === 'NotBeforeError'
         ) {
-          Logger.warn(err);
           throw new ForbiddenError();
         } else throw new BadTokenError();
       }
       // without checking IsApiError we can not use err.message property;
-      else if (IsApiError(err)) throw new InternalServerError(err.message);
+      else if (IsApiError(err)) throw err;
       else throw new InternalServerError();
     }
   }
@@ -109,9 +107,9 @@ export default class Jwt implements IJsonWebToken {
       const publicKey = await this.readPublicKey('utf8');
       if (!publicKey) throw new InternalServerError('Error Reading Key');
       // @ts-ignore
-      const payload = await promisify(verify)(token, publicKey, {
+      const payload = (await promisify(verify)(token, publicKey, {
         ignoreExpiration: true
-      });
+      })) as JwtPayload;
       if (payload) return payload;
       throw new InternalServerError('Failed To Decode Token');
     } catch (err) {

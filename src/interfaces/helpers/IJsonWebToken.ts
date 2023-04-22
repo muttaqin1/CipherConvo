@@ -1,4 +1,4 @@
-import { JwtPayload } from 'jsonwebtoken';
+import JwtPayload from '@interfaces/auth/JwtPayload';
 
 export default interface IJsonWebToken {
   generateToken: (payload: JwtPayload) => Promise<string>;
