@@ -5,7 +5,7 @@ import Logger from '@helpers/Logger';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
-import { IsProduction } from '@config/index';
+import { IsProduction, port } from '@config/index';
 import Container from '@config/container';
 import {
   customOrigin,
@@ -69,8 +69,9 @@ sequelize
   .catch((err) => {
     Logger.error('Unable to connect to the database:', err);
   });
-const expServer = app.listen(3000, () => {
-  Logger.info('Server is running on port 3000');
+
+const expServer = app.listen(port, () => {
+  Logger.info(`Server is running on port ${port}`);
 });
 // handle unhandledRejection and exit the application with code 1.
 process.on('unhandledRejection', (err) => {

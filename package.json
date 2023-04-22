@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "NODE_ENV=DEVELOPMENT ts-node-dev --respawn --quiet  --clear --rs -r tsconfig-paths/register ./src/index.ts",
     "prod": "NODE_ENV=PRODUCTION node ./dist/index.js",
-    "test": "jest --detectOpenHandles",
+    "test": "jest",
     "build": "tsc && tsc-alias"
   },
   "devDependencies": {
