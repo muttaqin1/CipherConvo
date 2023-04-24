@@ -1,9 +1,13 @@
 import { genSalt, hash } from 'bcryptjs';
+import { Request } from 'express';
+import {
+  ForbiddenError,
+  InternalServerError
+} from '@helpers/AppError/ApiError';
 import { passwordHashSaltRound } from '@config/index';
-import IAuthUtils from '@interfaces/auth/IAuthUtils';
+import IAuthUtils from '@interfaces/helpers/IAuthUtils';
 import { injectable } from 'inversify';
 import { Password } from '@interfaces/models/IUser';
-import { InternalServerError } from '@helpers/AppError/ApiError';
 
 @injectable()
 export default class AuthUtils implements IAuthUtils {
@@ -30,5 +34,15 @@ export default class AuthUtils implements IAuthUtils {
     const generatedPassword =
       genPassWithEnteredPassAndDbSavedPassSalt.split(':')[0];
     return generatedPassword === password;
+  }
+
+  private sanitizeAuthHeader(req: Request): string | undefined {
+    const authHeader = req.get('Authorization');
+    if (!authHeader) throw new ForbiddenError('Authorization Failure');
+    else if (!authHeader.match(/^Bearer/))
+      throw new ForbiddenError('Authorization Failure');
+    else if (!authHeader.split(' ')[1])
+      throw new ForbiddenError('Authorization Failure');
+    else return authHeader.split(' ')[0];
   }
 }
