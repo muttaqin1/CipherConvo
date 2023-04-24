@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import { IsProduction, port } from '@config/index';
-import Container from '@config/container';
+import Container from '@ioc/container';
 import {
   customOrigin,
   globalErrorHandler,
@@ -16,6 +16,7 @@ import {
 import { sequelize } from '@database/index';
 import syncDatabase from '@database/syncTables';
 import '@middlewares/notFoundHandler';
+import '@controllers/UserController';
 
 // handle uncaughtException and exit the application with code 1.
 process.on('uncaughtException', (err) => {
