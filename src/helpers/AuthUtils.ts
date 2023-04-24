@@ -4,7 +4,7 @@ import {
   ForbiddenError,
   InternalServerError
 } from '@helpers/AppError/ApiError';
-import { passwordHashSaltRound } from '@config/index';
+import { JWT, passwordHashSaltRound } from '@config/index';
 import IAuthUtils from '@interfaces/helpers/IAuthUtils';
 import { injectable } from 'inversify';
 import { Password } from '@interfaces/models/IUser';
@@ -44,5 +44,15 @@ export default class AuthUtils implements IAuthUtils {
     else if (!authHeader.split(' ')[1])
       throw new ForbiddenError('Authorization Failure');
     else return authHeader.split(' ')[0];
+  }
+
+  private verifyJwtPayload(payload: Record<string, any>): boolean {
+    if (!payload) return false;
+    if (!payload.iss || !payload.iat || !payload.sub || !payload.aud)
+      return false;
+    if (payload.iss !== JWT.iss) return false;
+    if (payload.sub !== JWT.sub) return false;
+    if (payload.aud !== JWT.aud) return false;
+    return true;
   }
 }
