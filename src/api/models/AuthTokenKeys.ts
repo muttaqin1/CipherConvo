@@ -1,5 +1,4 @@
 import IAuthTokenKeys from '@interfaces/models/IAuthTokenKeys';
-import User from '@models/User';
 import { Model, Optional, DataTypes } from 'sequelize';
 import { v4 as uuid } from 'uuid';
 import { sequelize } from '@database/index';
