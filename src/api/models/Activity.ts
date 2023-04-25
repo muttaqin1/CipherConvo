@@ -5,10 +5,6 @@ import { v4 as uuid } from 'uuid';
 
 export type activityInput = Optional<IActivity, 'id'>;
 export type activityOutput = Required<IActivity>;
-export type activityUpdate = Optional<
-  IActivity,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
->;
 
 export default class Activity
   extends Model<activityOutput, activityInput>
