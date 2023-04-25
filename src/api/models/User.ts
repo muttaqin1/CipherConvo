@@ -1,13 +1,15 @@
-import { Model, DataTypes, Optional } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '@database/index';
 import IUser, { Password } from '@interfaces/models/IUser';
 import { v4 as uuid } from 'uuid';
 import Role from '@models/Role';
 import Activity from '@models/Activity';
+import { injectable } from 'inversify';
 
 export type userInput = IUser;
-export type userInputUpdate = Optional<IUser, 'id' | 'email' | 'password'>;
 export type userOutput = Required<IUser>;
+
+@injectable()
 export default class User
   extends Model<userOutput, userInput>
   implements IUser
@@ -96,9 +98,10 @@ User.init(
 
 User.hasOne(Role, {
   foreignKey: 'userId',
-  as: 'role'
+  as: 'roles'
 });
+
 User.hasOne(Activity, {
   foreignKey: 'userId',
-  as: 'activity'
+  as: 'activities'
 });

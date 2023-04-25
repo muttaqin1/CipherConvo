@@ -10,16 +10,16 @@ import {
 import { JWT, passwordHashSaltRound } from '@config/index';
 import IAuthUtils from '@interfaces/helpers/IAuthUtils';
 import { inject, injectable } from 'inversify';
-import Jwt from '@helpers/Jwt';
 import IJsonWebToken from '@interfaces/helpers/IJsonWebToken';
 import IToken from '@interfaces/auth/IToken';
 import IUser, { Password } from '@interfaces/models/IUser';
 import { TokenExpiredError } from 'jsonwebtoken';
 import JwtPayload from '@interfaces/auth/JwtPayload';
+import TYPES from '@ioc/TYPES';
 
 @injectable()
 export default class AuthUtils implements IAuthUtils {
-  constructor(@inject(Jwt) private readonly jwt: IJsonWebToken) {}
+  constructor(@inject(TYPES.JWT) private readonly jwt: IJsonWebToken) {}
 
   protected async generateSalt(): Promise<string> {
     return genSalt(passwordHashSaltRound);

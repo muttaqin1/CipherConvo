@@ -1,4 +1,5 @@
 export type Password = `${string}:${string}`;
+
 export default interface IUser {
   id?: string;
   userName: string;
