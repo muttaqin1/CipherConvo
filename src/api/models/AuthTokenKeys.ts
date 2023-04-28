@@ -1,10 +1,10 @@
 import IAuthTokenKeys from '@interfaces/models/IAuthTokenKeys';
-import { Model, Optional, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import { v4 as uuid } from 'uuid';
 import { sequelize } from '@database/index';
 import { injectable } from 'inversify';
 
-export type AuthTokenKeysInput = Optional<IAuthTokenKeys, 'userId'>;
+export type AuthTokenKeysInput = IAuthTokenKeys;
 export type AuthTokenKeysOutput = Required<IAuthTokenKeys>;
 
 @injectable()

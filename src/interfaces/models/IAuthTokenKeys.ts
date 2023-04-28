@@ -1,5 +1,5 @@
 export default interface IAuthTokenKeys {
-  id:string;
+  id?: string;
   userId: string;
   accessTokenKey: string;
   refreshTokenKey: string;

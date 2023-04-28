@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '@database/index';
 import IUser, { Password } from '@interfaces/models/IUser';
 import { v4 as uuid } from 'uuid';
@@ -6,7 +6,10 @@ import Role from '@models/Role';
 import Activity from '@models/Activity';
 import { injectable } from 'inversify';
 
-export type userInput = IUser;
+export type userInput = Optional<
+  IUser,
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'roleId' | 'activityId'
+>;
 export type userOutput = Required<IUser>;
 
 @injectable()
@@ -77,7 +80,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    activityId: DataTypes.UUID,
+    activityId: {
+      type: DataTypes.UUID,
+      allowNull: true
+    },
     roleId: DataTypes.UUID,
     avatar: {
       type: DataTypes.STRING,
