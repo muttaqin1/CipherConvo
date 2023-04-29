@@ -18,9 +18,9 @@ type responseCodes = TErrorStatusCode | successResponseCodeTypes;
  * @description This class is the base class for all the response classes
  */
 export abstract class BaseResponse {
-  private ResponseStatus: responseCodes = 201;
+  private ResponseStatus: responseCodes = 200;
 
-  private defaultMessage = 'No Data';
+  private defaultMessage = 'No Data available';
 
   constructor(protected res: Response) {}
 

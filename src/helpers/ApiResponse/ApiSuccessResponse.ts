@@ -1,3 +1,4 @@
+import IApiSuccessResponse from '@interfaces/helpers/IApiResponse/IApiSuccessResponse';
 import { BaseResponse, successResponseCodeTypes } from './BaseResponse';
 
 /**
@@ -5,7 +6,10 @@ import { BaseResponse, successResponseCodeTypes } from './BaseResponse';
  * @description This class is used to send success response
  */
 
-export default class ApiSuccessResponse extends BaseResponse {
+export default class ApiSuccessResponse
+  extends BaseResponse
+  implements IApiSuccessResponse
+{
   public setCookie(name: string, expiry: number, payload: string): this {
     this.res.cookie(name, payload, {
       httpOnly: true,

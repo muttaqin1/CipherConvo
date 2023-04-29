@@ -1,6 +1,7 @@
 import { IsApiError } from '@helpers/AppError/ApiError';
 import ErrorMessage from '@helpers/AppError/errorMessages';
 import { errorStatusCodes } from '@helpers/AppError/errorStatusCodes';
+import IApiErrorResponse from '@interfaces/helpers/IApiResponse/IApiErrorResponse';
 import { BaseResponse } from './BaseResponse';
 
 /**
@@ -8,7 +9,10 @@ import { BaseResponse } from './BaseResponse';
  * @description This class is used to send error response
  */
 
-export default class ApiErrorResponse extends BaseResponse {
+export default class ApiErrorResponse
+  extends BaseResponse
+  implements IApiErrorResponse
+{
   public override send(err: any): void {
     if (IsApiError(err)) {
       this.setResponseStatus = err.statusCode;
