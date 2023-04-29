@@ -27,7 +27,7 @@ export default class User
 
   public email!: string;
 
-  public password!: Password;
+  public password!: Password | null;
 
   public gender!: string;
 
@@ -76,14 +76,8 @@ User.init(
         isEmail: true
       }
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    activityId: {
-      type: DataTypes.UUID,
-      allowNull: true
-    },
+    password: DataTypes.STRING,
+    activityId: DataTypes.UUID,
     roleId: DataTypes.UUID,
     avatar: {
       type: DataTypes.STRING,

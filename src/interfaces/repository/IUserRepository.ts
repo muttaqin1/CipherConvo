@@ -13,7 +13,7 @@ export type notChangeable =
 
 export interface UserIncludedRolesAndActivities extends userOutput {
   roles: roleOutput;
-  activities: activityOutput;
+  activities: activityOutput | null;
 }
 export default interface IUserRepository {
   createUser(user: userInput): Promise<userOutput | null>;

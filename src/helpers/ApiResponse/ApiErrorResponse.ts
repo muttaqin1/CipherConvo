@@ -1,7 +1,7 @@
 import { IsApiError } from '@helpers/AppError/ApiError';
 import ErrorMessage from '@helpers/AppError/errorMessages';
 import { errorStatusCodes } from '@helpers/AppError/errorStatusCodes';
-import IApiErrorResponse from '@interfaces/helpers/IApiResponse/IApiErrorResponse';
+import IApiErrorResponse from '@interfaces/helpers/ApiResponse/IApiErrorResponse';
 import { BaseResponse } from './BaseResponse';
 
 /**

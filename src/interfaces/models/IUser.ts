@@ -6,7 +6,7 @@ export default interface IUser {
   firstName: string;
   lastName: string;
   email: string;
-  password: Password;
+  password: Password | null;
   gender: string;
   activityId: string | null;
   roleId: string | null;

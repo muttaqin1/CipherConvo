@@ -11,7 +11,7 @@ export default class AuthTokenKeysRepository
   implements IAuthTokenKeysRepository
 {
   constructor(
-    @inject(TYPES.AuthTokenKeys)
+    @inject(TYPES.AuthTokenKeysModel)
     private readonly authTokeKeys: typeof AuthTokenKeys
   ) {}
 

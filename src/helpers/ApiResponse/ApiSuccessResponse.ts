@@ -1,6 +1,5 @@
-import IApiSuccessResponse from '@interfaces/helpers/IApiResponse/IApiSuccessResponse';
+import IApiSuccessResponse from '@interfaces/helpers/ApiResponse/IApiSuccessResponse';
 import { BaseResponse, successResponseCodeTypes } from './BaseResponse';
-
 /**
  * @class ApiSuccessResponse
  * @description This class is used to send success response
