@@ -15,7 +15,15 @@ export default class AuthTokenKeysRepository
     private readonly authTokeKeys: typeof AuthTokenKeys
   ) {}
 
-  public create(data: AuthTokenKeysInput): Promise<AuthTokenKeysOutput> {
+  public findByUserId(userId: string): Promise<AuthTokenKeysOutput | null> {
+    return this.authTokeKeys.findOne({ where: { userId } });
+  }
+
+  public deleteKeys(userId: string): Promise<number> {
+    return this.authTokeKeys.destroy({ where: { userId } });
+  }
+
+  public createKeys(data: AuthTokenKeysInput): Promise<AuthTokenKeysOutput> {
     return this.authTokeKeys.create(data);
   }
 
