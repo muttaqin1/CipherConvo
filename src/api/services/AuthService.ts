@@ -18,6 +18,7 @@ import IAuthService from '@interfaces/service/IAuthService';
 import { userInput } from '@models/User';
 import IActivityRepository from '@interfaces/repository/IActivityRepository';
 import IRoleRepository from '@interfaces/repository/IRoleRepository';
+import { Password } from '@interfaces/models/IUser';
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -56,7 +57,7 @@ export default class AuthService implements IAuthService {
     // Generate new access token and refresh token keys.
     const accessTokenKey = randomBytes(64).toString('hex');
     const refreshTokenKey = randomBytes(64).toString('hex');
-    // check if the keys are already stored in database.
+    // check if the keys are already stored in database if stored delete them.
     const exists = await this.authTokenKeysRepo.findByUserId(user.id);
     if (exists) await this.authTokenKeysRepo.deleteKeys(user.id);
     // store the keys in database. this keys are used to verify the tokens. this keys will be stored in tokens. so when we want to validate the token we will match the keys with the database stored keys.
@@ -91,8 +92,15 @@ export default class AuthService implements IAuthService {
     // check if the user is registered with the provided username.
     const userName = await this.userRepo.findByUsername(userData.userName);
     if (userName) throw new BadRequestError('Username already exists');
+    // hash the password.
+    const hashedPassword = await this.authUtils.generatePassword(
+      userData.password as Password
+    );
     // create new user.
-    const user = await this.userRepo.createUser(userData);
+    const user = await this.userRepo.createUser({
+      ...userData,
+      password: hashedPassword as Password
+    });
     if (!user) throw new InternalServerError('Failed to create user');
     // create new activity for the user.
     const activity = await this.activityRepo.createActivity({
@@ -100,9 +108,9 @@ export default class AuthService implements IAuthService {
     });
     // create new role for the user.
     const role = await this.roleRepo.createRole({
-      admin: true,
-      user: true,
-      userId: user.id
+      userId: user.id,
+      admin: false,
+      user: true
     });
     // set role and activity id in user table.
     this.userRepo.setRoleAndActivityId(user.id, role.id, activity.id);

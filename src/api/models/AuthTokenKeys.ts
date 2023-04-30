@@ -50,7 +50,6 @@ AuthTokenKeys.init(
     sequelize,
     freezeTableName: true,
     tableName: 'auth_token_keys',
-    timestamps: true,
-    paranoid: true
+    timestamps: true
   }
 );

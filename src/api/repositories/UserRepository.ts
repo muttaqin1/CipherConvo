@@ -60,7 +60,10 @@ export default class UserRepository implements IUserRepository {
     userId: string,
     data: T
   ): Promise<[affectedCount: number]> {
-    return this.userModel.update(data, { where: { id: userId } });
+    return this.userModel.update(data, {
+      where: { id: userId },
+      limit: 1
+    });
   }
 
   public deleteUser(id: string): Promise<number> {
