@@ -4,7 +4,7 @@ import IUser, { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
 
 export default interface IAuthUtils {
-  generatePassword(password: string, salt: string): Promise<string>;
+  generatePassword(password: string, salt?: string): Promise<string>;
   validatePassword(
     enteredPassword: string,
     databaseSavedPassword: Password

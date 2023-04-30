@@ -27,10 +27,11 @@ export default class AuthUtils implements IAuthUtils {
 
   public async generatePassword(
     password: string,
-    salt: string
+    salt?: string
   ): Promise<Password> {
-    const hashedPassword = await hash(password, salt);
-    return `${hashedPassword}:${salt}`;
+    const passSalt = salt || (await this.generateSalt());
+    const hashedPassword = await hash(password, passSalt);
+    return `${hashedPassword}:${passSalt}`;
   }
 
   public async validatePassword(
