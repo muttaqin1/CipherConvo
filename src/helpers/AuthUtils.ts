@@ -141,4 +141,18 @@ export default class AuthUtils implements IAuthUtils {
       else throw err;
     }
   }
+
+  public async decodeAccessToken(req: Request): Promise<JwtPayload> {
+    try {
+      const token = this.sanitizeAuthHeader(req);
+      if (!token) throw new AuthFailureError();
+      const payload = await this.jwt.decodeToken(token);
+      if (!payload) throw new AuthFailureError();
+      if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
+      return payload;
+    } catch (err) {
+      if (err instanceof BadTokenError) throw new AccessTokenError();
+      else throw err;
+    }
+  }
 }
