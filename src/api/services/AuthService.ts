@@ -56,6 +56,9 @@ export default class AuthService implements IAuthService {
     // Generate new access token and refresh token keys.
     const accessTokenKey = randomBytes(64).toString('hex');
     const refreshTokenKey = randomBytes(64).toString('hex');
+    // check if the keys are already stored in database.
+    const exists = await this.authTokenKeysRepo.findByUserId(user.id);
+    if (exists) await this.authTokenKeysRepo.deleteKeys(user.id);
     // store the keys in database. this keys are used to verify the tokens. this keys will be stored in tokens. so when we want to validate the token we will match the keys with the database stored keys.
     const keys = await this.authTokenKeysRepo.createKeys({
       userId: user.id,
