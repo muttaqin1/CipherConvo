@@ -155,4 +155,11 @@ export default class AuthUtils implements IAuthUtils {
       else throw err;
     }
   }
+
+  public async verifyRefreshToken(refreshToken: string): Promise<JwtPayload> {
+    const payload = await this.jwt.verifyToken(refreshToken);
+    if (!payload) throw new AuthFailureError();
+    if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
+    return payload;
+  }
 }
