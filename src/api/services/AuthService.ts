@@ -6,7 +6,9 @@ import {
 } from '@helpers/AppError/ApiError';
 import IAuthUtils from '@interfaces/helpers/IAuthUtils';
 import IAuthTokenKeysRepository from '@interfaces/repository/IAuthTokenKeysRepository';
-import IUserRepository from '@interfaces/repository/IUserRepository';
+import IUserRepository, {
+  UserIncludedRolesAndActivities
+} from '@interfaces/repository/IUserRepository';
 import {
   loginResponse,
   singupResponse
@@ -139,5 +141,14 @@ export default class AuthService implements IAuthService {
       role,
       tokens
     };
+  }
+
+  public async logout(user: UserIncludedRolesAndActivities): Promise<boolean> {
+    try {
+      await this.authTokenKeysRepo.deleteKeys(user.id);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

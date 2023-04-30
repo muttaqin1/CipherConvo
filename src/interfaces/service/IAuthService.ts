@@ -1,3 +1,4 @@
+import { UserIncludedRolesAndActivities } from '@interfaces/repository/IUserRepository';
 import {
   loginResponse,
   singupResponse
@@ -11,4 +12,5 @@ export default interface IAuthService {
     password: string;
   }): Promise<loginResponse>;
   signup(userData: userInput): Promise<singupResponse>;
+  logout(user: UserIncludedRolesAndActivities): Promise<boolean>;
 }
