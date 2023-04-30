@@ -12,7 +12,11 @@ import TYPES from '@ioc/TYPES';
 import Role from '@models/Role';
 import Activity from '@models/Activity';
 import AuthService from '@services/AuthService';
-import IAuthService from '@interfaces/service/IUserService';
+import IAuthService from '@interfaces/service/IAuthService';
+import IActivityRepository from '@interfaces/repository/IActivityRepository';
+import IRoleRepository from '@interfaces/repository/IRoleRepository';
+import ActivityRepository from '@repositories/ActivityRepository';
+import RoleRepository from '@repositories/RoleRepository';
 /**
  * @description Container for dependency injection using inversify
  * @export container - Container instance for dependency injection
@@ -34,6 +38,14 @@ container
 container
   .bind<IAuthTokenKeysRepository>(TYPES.AuthTokenKeysRepository)
   .to(AuthTokenKeysRepository)
+  .inSingletonScope();
+container
+  .bind<IActivityRepository>(TYPES.ActivityRepository)
+  .to(ActivityRepository)
+  .inSingletonScope();
+container
+  .bind<IRoleRepository>(TYPES.RoleRepository)
+  .to(RoleRepository)
   .inSingletonScope();
 
 // services
