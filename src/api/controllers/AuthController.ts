@@ -13,7 +13,8 @@ import {
   httpDelete,
   httpPost,
   request,
-  response
+  response,
+  httpPut
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
 
@@ -63,5 +64,14 @@ export default class UserController implements IAuthController {
     const apiSuccessResponse = new ApiSuccessResponse(res);
     if (bool) apiSuccessResponse.send({ message: 'logout success' });
     else apiSuccessResponse.send({ message: 'logout fail' });
+  }
+
+  @httpPut('/token-refresh')
+  public async tokenRefresh(
+    @request() req: Request,
+    @response() res: Response
+  ): Promise<void> {
+    const responseData = await this.authService.refreshAccessToken(req);
+    new ApiSuccessResponse(res).send(responseData);
   }
 }
