@@ -10,6 +10,7 @@ import { inject } from 'inversify';
 import IAuthService from '@interfaces/service/IAuthService';
 import {
   controller,
+  httpDelete,
   httpPost,
   request,
   response
@@ -51,5 +52,16 @@ export default class UserController implements IAuthController {
       avatar
     });
     new ApiSuccessResponse(res).send<singupResponse>(responseData);
+  }
+
+  @httpDelete('/logout')
+  public async logout(
+    @request() req: Request,
+    @response() res: Response
+  ): Promise<void> {
+    const bool = await this.authService.logout(req.user);
+    const apiSuccessResponse = new ApiSuccessResponse(res);
+    if (bool) apiSuccessResponse.send({ message: 'logout success' });
+    else apiSuccessResponse.send({ message: 'logout fail' });
   }
 }
