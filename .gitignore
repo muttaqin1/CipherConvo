@@ -4,4 +4,4 @@ logs/
 keys/
 .env
 .vim/
-.plans.txt
+PLANS.txt

@@ -14,7 +14,7 @@
     "incremental": true,
     "strict": true,
     "moduleResolution": "node",
-    "types": ["reflect-metadata"],
+    "types": ["reflect-metadata", "jest"],
     "paths": {
       "@helpers/*": ["helpers/*"],
       "@constants/*": ["constants/*"],
@@ -45,6 +45,6 @@
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*.ts", "src/**/*.test.ts"],
-  "exclude": ["node_modules", "dist", "src/**/*.spec.ts"]
+  "include": ["src", "tests/**/*.ts", "tests/**/*.test.ts"],
+  "exclude": ["node_modules", "tests"]
 }
