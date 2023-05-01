@@ -1,7 +1,7 @@
 import IUser from '@interfaces/models/IUser';
 import { activityOutput } from '@models/Activity';
 import { roleOutput } from '@models/Role';
-import User, { userInput, userOutput } from '@models/User';
+import { userInput, userOutput } from '@models/User';
 
 export type notChangeable =
   | 'userName'
