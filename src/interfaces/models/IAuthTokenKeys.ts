@@ -5,5 +5,4 @@ export default interface IAuthTokenKeys {
   refreshTokenKey: string;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }

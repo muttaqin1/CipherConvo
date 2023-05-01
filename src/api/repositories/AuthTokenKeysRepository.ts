@@ -16,10 +16,6 @@ export default class AuthTokenKeysRepository
     private readonly authTokeKeys: typeof AuthTokenKeys
   ) {}
 
-  public findByUserId(userId: string): Promise<AuthTokenKeysOutput | null> {
-    return this.authTokeKeys.findOne({ where: { userId } });
-  }
-
   public deleteKeys(userId: string): Promise<number> {
     return this.authTokeKeys.destroy({ where: { userId } });
   }
@@ -36,17 +32,11 @@ export default class AuthTokenKeysRepository
     }
   }
 
-  public findByAccessTokenKey(
-    userId: string,
-    accessTokenKey: string
-  ): Promise<AuthTokenKeysOutput | null> {
-    return this.authTokeKeys.findOne({ where: { userId, accessTokenKey } });
-  }
-
-  findByRefreshTokenKey(
-    userId: string,
-    refreshTokenKey: string
-  ): Promise<AuthTokenKeysOutput | null> {
-    return this.authTokeKeys.findOne({ where: { userId, refreshTokenKey } });
+  public findKeys(data: {
+    userId?: string;
+    accessTokenKey?: string;
+    refreshTokenKey?: string;
+  }): Promise<AuthTokenKeysOutput | null> {
+    return this.authTokeKeys.findOne({ where: data });
   }
 }

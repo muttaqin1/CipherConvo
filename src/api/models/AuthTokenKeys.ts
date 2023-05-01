@@ -1,10 +1,13 @@
 import IAuthTokenKeys from '@interfaces/models/IAuthTokenKeys';
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Optional } from 'sequelize';
 import { v4 as uuid } from 'uuid';
 import { sequelize } from '@database/index';
 import { injectable } from 'inversify';
 
-export type AuthTokenKeysInput = IAuthTokenKeys;
+export type AuthTokenKeysInput = Optional<
+  IAuthTokenKeys,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 export type AuthTokenKeysOutput = Required<IAuthTokenKeys>;
 
 @injectable()
@@ -23,8 +26,6 @@ export default class AuthTokenKeys
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
-
-  public readonly deletedAt!: Date;
 }
 AuthTokenKeys.init(
   {
