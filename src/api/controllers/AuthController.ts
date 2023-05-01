@@ -1,5 +1,8 @@
 import ApiSuccessResponse from '@helpers/ApiResponse/ApiSuccessResponse';
-import { loginResponse } from '@interfaces/response/authContollerResponse';
+import {
+  loginResponse,
+  singupResponse
+} from '@interfaces/response/authContollerResponse';
 import TYPES from '@ioc/TYPES';
 import { Response } from 'express';
 import Request from '@interfaces/request';
@@ -31,5 +34,22 @@ export default class UserController implements IAuthController {
       password
     });
     new ApiSuccessResponse(res).send<loginResponse>(responseData);
+  }
+
+  @httpPost('/signup')
+  public async signup(@request() req: Request, @response() res: Response) {
+    const { userName, firstName, lastName, email, password, gender, avatar } =
+      req.body;
+
+    const responseData = await this.authService.signup({
+      userName,
+      firstName,
+      lastName,
+      email,
+      password,
+      gender,
+      avatar
+    });
+    new ApiSuccessResponse(res).send<singupResponse>(responseData);
   }
 }
