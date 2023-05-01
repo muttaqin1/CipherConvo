@@ -1,0 +1,35 @@
+import ApiSuccessResponse from '@helpers/ApiResponse/ApiSuccessResponse';
+import { loginResponse } from '@interfaces/response/authContollerResponse';
+import TYPES from '@ioc/TYPES';
+import { Response } from 'express';
+import Request from '@interfaces/request';
+import { inject } from 'inversify';
+import IAuthService from '@interfaces/service/IAuthService';
+import {
+  controller,
+  httpPost,
+  request,
+  response
+} from 'inversify-express-utils';
+import IAuthController from '@interfaces/controller/IAuthController';
+
+@controller('/v1/auth')
+export default class UserController implements IAuthController {
+  constructor(
+    @inject(TYPES.AuthService) private readonly authService: IAuthService
+  ) {}
+
+  @httpPost('/login')
+  public async login(
+    @request() req: Request,
+    @response() res: Response
+  ): Promise<void> {
+    const { userName, email, password } = req.body;
+    const responseData = await this.authService.login({
+      userName,
+      email,
+      password
+    });
+    new ApiSuccessResponse(res).send<loginResponse>(responseData);
+  }
+}
