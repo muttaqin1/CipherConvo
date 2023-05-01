@@ -1,7 +1,7 @@
 import IRole from '@interfaces/models/IRole';
 import IUser from '@interfaces/models/IUser';
 
-interface ITokens {
+export interface ITokens {
   accessToken: string;
   refreshToken: string;
 }
