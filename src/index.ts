@@ -14,9 +14,9 @@ import {
   shouldCompress
 } from '@middlewares/index';
 import { sequelize } from '@database/index';
-import syncDatabase from '@database/syncTables';
+import sync from '@database/sync';
 import '@middlewares/notFoundHandler';
-import '@controllers/UserController';
+import '@controllers/AuthController';
 
 // handle uncaughtException and exit the application with code 1.
 process.on('uncaughtException', (err) => {
@@ -59,7 +59,7 @@ sequelize
   .authenticate({ logging: false })
   .then(() => {
     Logger.info('Database is connected');
-    syncDatabase()
+    sync()
       .then(() => {
         Logger.info('Database is synced');
       })
