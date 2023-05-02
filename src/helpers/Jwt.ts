@@ -26,7 +26,6 @@ const IsJsonWebTokenError = (err: unknown): err is JsonWebTokenError =>
 
 @injectable()
 export default class Jwt implements IJsonWebToken {
-  // eslint-disable-next-line class-methods-use-this
   protected getKeysPath(): { pubKeyPath: string; privKeyPath: string } {
     return {
       pubKeyPath: `${keyDirPath}/public.pem`,
@@ -61,7 +60,7 @@ export default class Jwt implements IJsonWebToken {
         algorithm: 'RS256'
       }) as string;
       if (token) return token;
-      throw new InternalServerError('Failed To Generate  Token');
+      throw new InternalServerError('Failed To Generate Token');
     } catch (err) {
       if (IsJsonWebTokenError(err)) {
         Logger.debug(err);
