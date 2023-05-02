@@ -71,8 +71,7 @@ export default class Jwt implements IJsonWebToken {
       const publicKey = await this.readPublicKey('utf8');
       if (!publicKey) throw new InternalServerError();
       // @ts-ignore
-      const payload = (await promisify(verify)(token, publicKey)) as JwtPayload;
-      return payload;
+      return (await promisify(verify)(token, publicKey)) as JwtPayload;
     } catch (err) {
       if (IsJsonWebTokenError(err)) {
         if (
