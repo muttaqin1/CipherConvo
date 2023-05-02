@@ -16,7 +16,6 @@ import {
   JsonWebTokenError
 } from 'jsonwebtoken';
 import { promisify } from 'util';
-import Logger from '@helpers/Logger';
 import IJsonWebToken from '@interfaces/helpers/IJsonWebToken';
 import { injectable } from 'inversify';
 import JwtPayload from '@interfaces/auth/JwtPayload';
@@ -56,16 +55,11 @@ export default class Jwt implements IJsonWebToken {
       const privateKey = await this.readPrivateKey('utf8');
       if (!privateKey) throw new InternalServerError();
       // @ts-ignore
-      const token = promisify(sign)(payload, privateKey, {
+      return promisify(sign)(payload, privateKey, {
         algorithm: 'RS256'
       }) as string;
-      if (token) return token;
-      throw new InternalServerError('Failed To Generate Token');
     } catch (err) {
-      if (IsJsonWebTokenError(err)) {
-        Logger.debug(err);
-        throw new InternalServerError();
-      }
+      if (IsJsonWebTokenError(err)) throw new InternalServerError();
       // without checking IsApiError we can not use err.message property;
       if (IsApiError(err)) throw err;
       else throw new InternalServerError();
