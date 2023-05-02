@@ -13,7 +13,7 @@ const colors = {
 
 const level = IsProduction() ? 'warn' : 'debug';
 
-export const fileOpitons: DailyRotateFileTransportOptions = {
+export const fileOptions: DailyRotateFileTransportOptions = {
   level,
   dirname: logFilePath,
   filename: '%DATE%.log',
