@@ -44,20 +44,47 @@ export default class AuthService implements IAuthService {
     const { userName, email, password } = loginCredentials;
     let user;
     // check if the user is registered with the provided email or username.
-    if (email) user = await this.userRepo.findUserByEmail(email);
-    else if (userName) user = await this.userRepo.findByUsername(userName);
+    if (email)
+      user = await this.userRepo.findUserByEmail(email, { activity: true });
+    else if (userName)
+      user = await this.userRepo.findByUsername(userName, { activity: true });
     else throw new BadRequestError('Please provide email or username');
     // If no user is registered with the provided email or username, throw an error.
     if (!user) throw new ForbiddenError('User not found');
     if (!user.password) throw new ForbiddenError('Missing user credentials');
+    if (user.activities && user.activities.permanentAccessRestricted)
+      throw new ForbiddenError(
+        'Account permanently banned. Contact support for more information.'
+      );
+    if (user.activities && user.activities.accessRestriced)
+      throw new ForbiddenError(
+        'Access restricted. Verify yourself to continue.'
+      );
     // validate plain text password with database saved password.
     const isValidPass = await this.authUtils.validatePassword(
       password,
       user.password
     );
     // If password is not valid, throw an error.
-    if (!isValidPass) throw new AuthFailureError('Invalid Password');
+    if (!isValidPass) {
+      if (user.activities) {
+        if (user.activities.failedLoginAttempts >= 10) {
+          await this.activityRepo.updateActivity(user.id, {
+            accessRestriced: true,
+            failedLoginAttempts: 0
+          });
+        } else {
+          await this.activityRepo.updateActivity(user.id, {
+            failedLoginAttempts: user.activities.failedLoginAttempts + 1
+          });
+        }
+      }
 
+      throw new AuthFailureError('Invalid Password');
+    }
+    await this.activityRepo.updateActivity(user.id, {
+      failedLoginAttempts: 0
+    });
     // Generate new access token and refresh token keys.
     const accessTokenKey = randomBytes(64).toString('hex');
     const refreshTokenKey = randomBytes(64).toString('hex');

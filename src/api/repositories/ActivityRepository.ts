@@ -12,4 +12,13 @@ export default class ActivityRepository implements IActivityRepository {
   public async createActivity(data: activityInput): Promise<activityOutput> {
     return this.activityModel.create(data);
   }
+
+  public async updateActivity(
+    userId: string,
+    data: Partial<activityInput>
+  ): Promise<[affectedCount: number]> {
+    return this.activityModel.update(data, {
+      where: { id: userId }
+    });
+  }
 }
