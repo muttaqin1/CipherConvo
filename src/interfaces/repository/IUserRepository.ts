@@ -12,17 +12,22 @@ export type notChangeable =
   | 'deletedAt';
 
 export interface UserIncludedRolesAndActivities extends userOutput {
-  roles: roleOutput;
-  activities: activityOutput | null;
+  roles?: roleOutput;
+  activities?: activityOutput | null;
 }
 export default interface IUserRepository {
   createUser(user: userInput): Promise<userOutput | null>;
-  findUserById(id: string): Promise<UserIncludedRolesAndActivities | null>;
+  findUserById(
+    id: string,
+    options?: { role?: boolean; activity?: boolean }
+  ): Promise<UserIncludedRolesAndActivities | null>;
   findUserByEmail(
-    email: string
+    email: string,
+    options?: { role?: boolean; activity?: boolean }
   ): Promise<UserIncludedRolesAndActivities | null>;
   findByUsername(
-    username: string
+    username: string,
+    options?: { role?: boolean; activity?: boolean }
   ): Promise<UserIncludedRolesAndActivities | null>;
   updateUser<T extends Partial<Omit<Required<IUser>, notChangeable>>>(
     userId: string,

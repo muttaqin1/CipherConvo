@@ -17,43 +17,61 @@ export default class UserRepository implements IUserRepository {
     @inject(TYPES.ActivityModel) private readonly activityModel: typeof Activity
   ) {}
 
-  public createUser(user: userInput): Promise<userOutput | null> {
-    return this.userModel.create(user);
+  public async createUser(user: userInput): Promise<userOutput | null> {
+    try {
+      return await this.userModel.create(user);
+    } catch {
+      return null;
+    }
   }
 
   public findUserById(
-    id: string
+    id: string,
+    options?: {
+      role?: boolean;
+      activity?: boolean;
+    }
   ): Promise<UserIncludedRolesAndActivities | null> {
-    return this.userModel.findByPk(id, {
-      include: [
-        { model: this.roleModel, as: 'roles' },
-        { model: this.activityModel, as: 'activities' }
-      ]
-    }) as Promise<UserIncludedRolesAndActivities | null>;
+    const include = [];
+    if (options?.role) include.push({ model: this.roleModel, as: 'roles' });
+    if (options?.activity)
+      include.push({ model: this.activityModel, as: 'activities' });
+    return this.userModel.findOne({
+      where: { id },
+      include
+    });
   }
 
   public findUserByEmail(
-    email: string
+    email: string,
+    options?: {
+      role?: boolean;
+      activity?: boolean;
+    }
   ): Promise<UserIncludedRolesAndActivities | null> {
+    const include = [];
+    if (options?.role) include.push({ model: this.roleModel, as: 'roles' });
+    if (options?.activity) include.push({ model: this.activityModel });
     return this.userModel.findOne({
       where: { email },
-      include: [
-        { model: this.roleModel, as: 'roles' },
-        { model: this.activityModel, as: 'activities' }
-      ]
-    }) as Promise<UserIncludedRolesAndActivities | null>;
+      include
+    });
   }
 
   public findByUsername(
-    userName: string
+    userName: string,
+    options?: {
+      role?: boolean;
+      activity?: boolean;
+    }
   ): Promise<UserIncludedRolesAndActivities | null> {
+    const include = [];
+    if (options?.role) include.push({ model: this.roleModel, as: 'roles' });
+    if (options?.activity) include.push({ model: this.activityModel });
     return this.userModel.findOne({
       where: { userName },
-      include: [
-        { model: this.roleModel, as: 'roles' },
-        { model: this.activityModel, as: 'activities' }
-      ]
-    }) as Promise<UserIncludedRolesAndActivities | null>;
+      include
+    });
   }
 
   public updateUser<T extends Partial<Omit<IUser, notChangeable>>>(
