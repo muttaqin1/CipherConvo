@@ -55,9 +55,9 @@ export default class Jwt implements IJsonWebToken {
       const privateKey = await this.readPrivateKey('utf8');
       if (!privateKey) throw new InternalServerError();
       // @ts-ignore
-      return promisify(sign)(payload, privateKey, {
+      return (await promisify(sign)(payload, privateKey, {
         algorithm: 'RS256'
-      }) as string;
+      })) as string;
     } catch (err) {
       if (IsJsonWebTokenError(err)) throw new InternalServerError();
       // without checking IsApiError we can not use err.message property;
@@ -97,13 +97,11 @@ export default class Jwt implements IJsonWebToken {
   public async decodeToken(token: string): Promise<JwtPayload> {
     try {
       const publicKey = await this.readPublicKey('utf8');
-      if (!publicKey) throw new InternalServerError('Error Reading Key');
+      if (!publicKey) throw new InternalServerError();
       // @ts-ignore
-      const payload = (await promisify(verify)(token, publicKey, {
+      return (await promisify(verify)(token, publicKey, {
         ignoreExpiration: true
       })) as JwtPayload;
-      if (payload) return payload;
-      throw new InternalServerError('Failed To Decode Token');
     } catch (err) {
       if (IsJsonWebTokenError(err)) throw new BadTokenError();
       // without checking IsApiError we can not use err.message property;
