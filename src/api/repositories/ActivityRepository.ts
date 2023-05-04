@@ -9,7 +9,7 @@ export default class ActivityRepository implements IActivityRepository {
     @inject(TYPES.ActivityModel) private readonly activityModel: typeof Activity
   ) {}
 
-  public async createActivity(data: activityInput): Promise<activityOutput> {
+  public createActivity(data: activityInput): Promise<activityOutput> {
     return this.activityModel.create(data);
   }
 
@@ -18,7 +18,8 @@ export default class ActivityRepository implements IActivityRepository {
     data: Partial<activityInput>
   ): Promise<[affectedCount: number]> {
     return this.activityModel.update(data, {
-      where: { id: userId }
+      where: { userId },
+      limit: 1
     });
   }
 }

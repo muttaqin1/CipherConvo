@@ -2,10 +2,15 @@ import IActivity from '@interfaces/models/IActivity';
 import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '@database/index';
 import { v4 as uuid } from 'uuid';
+import { injectable } from 'inversify';
 
-export type activityInput = Optional<IActivity, 'id'>;
+export type activityInput = Optional<
+  IActivity,
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
+>;
 export type activityOutput = Required<IActivity>;
 
+@injectable()
 export default class Activity
   extends Model<activityOutput, activityInput>
   implements IActivity
@@ -22,7 +27,7 @@ export default class Activity
 
   public permanentAccessRestricted!: boolean;
 
-  public accessRestriced!: boolean;
+  public accessRestricted!: boolean;
 
   public accessRestrictedUntil!: Date;
 
@@ -62,7 +67,7 @@ Activity.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    accessRestriced: {
+    accessRestricted: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },

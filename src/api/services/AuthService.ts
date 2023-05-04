@@ -52,11 +52,13 @@ export default class AuthService implements IAuthService {
     // If no user is registered with the provided email or username, throw an error.
     if (!user) throw new ForbiddenError('User not found');
     if (!user.password) throw new ForbiddenError('Missing user credentials');
+    // If the account is permanently restricted, throw an error.
     if (user.activities && user.activities.permanentAccessRestricted)
       throw new ForbiddenError(
         'Account permanently banned. Contact support for more information.'
       );
-    if (user.activities && user.activities.accessRestriced)
+    // If the account access restricted, throw an error.
+    if (user.activities && user.activities.accessRestricted)
       throw new ForbiddenError(
         'Access restricted. Verify yourself to continue.'
       );
@@ -67,24 +69,30 @@ export default class AuthService implements IAuthService {
     );
     // If password is not valid, throw an error.
     if (!isValidPass) {
-      if (user.activities) {
-        if (user.activities.failedLoginAttempts >= 10) {
-          await this.activityRepo.updateActivity(user.id, {
-            accessRestriced: true,
-            failedLoginAttempts: 0
-          });
-        } else {
-          await this.activityRepo.updateActivity(user.id, {
-            failedLoginAttempts: user.activities.failedLoginAttempts + 1
-          });
-        }
+      if (!user.activities) throw new ForbiddenError();
+      // If the failed login attempts count is greater or equal to 8 restrict the account.
+      if (user.activities.failedLoginAttempts >= 8) {
+        // restrict the account.
+        await this.activityRepo.updateActivity(user.id, {
+          accessRestricted: true,
+          failedLoginAttempts: 0
+        });
+        // Remove the user's auth token keys.
+        await this.authTokenKeysRepo.deleteKeys(user.id);
       }
+      // Increment failed login count by 1.
+      else
+        await this.activityRepo.updateActivity(user.id, {
+          failedLoginAttempts: user.activities.failedLoginAttempts + 1
+        });
 
       throw new AuthFailureError('Invalid Password');
     }
+    // If login success clear the failed login attempts.
     await this.activityRepo.updateActivity(user.id, {
       failedLoginAttempts: 0
     });
+
     // Generate new access token and refresh token keys.
     const accessTokenKey = randomBytes(64).toString('hex');
     const refreshTokenKey = randomBytes(64).toString('hex');

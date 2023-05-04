@@ -5,7 +5,7 @@ export default interface IActivity {
   emailVerified?: boolean;
   sendedTwoFactorAuthCodeCount?: number;
   permanentAccessRestricted?: boolean;
-  accessRestriced?: boolean;
+  accessRestricted?: boolean;
   accessRestrictedUntil?: Date;
   twoFactorAuthRestricted?: boolean;
   twoFactorAuthRestrictedUntil?: Date;
