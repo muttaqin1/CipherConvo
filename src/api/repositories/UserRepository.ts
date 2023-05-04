@@ -51,7 +51,8 @@ export default class UserRepository implements IUserRepository {
   ): Promise<UserIncludedRolesAndActivities | null> {
     const include = [];
     if (options?.role) include.push({ model: this.roleModel, as: 'roles' });
-    if (options?.activity) include.push({ model: this.activityModel });
+    if (options?.activity)
+      include.push({ model: this.activityModel, as: 'activities' });
     return this.userModel.findOne({
       where: { email },
       include
@@ -67,7 +68,8 @@ export default class UserRepository implements IUserRepository {
   ): Promise<UserIncludedRolesAndActivities | null> {
     const include = [];
     if (options?.role) include.push({ model: this.roleModel, as: 'roles' });
-    if (options?.activity) include.push({ model: this.activityModel });
+    if (options?.activity)
+      include.push({ model: this.activityModel, as: 'activities' });
     return this.userModel.findOne({
       where: { userName },
       include
