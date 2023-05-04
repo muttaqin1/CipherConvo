@@ -1,4 +1,4 @@
-export default interface Token {
+export default interface IToken {
   accessToken: string;
   refreshToken: string;
 }

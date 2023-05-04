@@ -10,10 +10,10 @@ import IUserRepository, {
   UserIncludedRolesAndActivities
 } from '@interfaces/repository/IUserRepository';
 import {
-  ITokens,
   loginResponse,
   singupResponse
 } from '@interfaces/response/authContollerResponse';
+import IToken from '@interfaces/auth/IToken';
 import TYPES from '@ioc/TYPES';
 import { randomBytes } from 'crypto';
 import { inject, injectable } from 'inversify';
@@ -181,7 +181,7 @@ export default class AuthService implements IAuthService {
     }
   }
 
-  public async refreshAccessToken(req: Request): Promise<ITokens> {
+  public async refreshAccessToken(req: Request): Promise<IToken> {
     const { refreshToken } = req.body;
     // decode the access token even if it is expired.
     const accessTokenPayload = await this.authUtils.decodeAccessToken(req);
