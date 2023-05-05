@@ -13,6 +13,7 @@ import {
   AccessTokenError,
   AuthFailureError,
   BadTokenError,
+  ForbiddenError,
   InternalServerError,
   NoDataError
 } from '../../../../src/helpers/AppError/ApiError';
@@ -216,7 +217,6 @@ describe('Helper Class: AuthUtils', () => {
       expect(mockDecodeToken).toBeCalledTimes(1);
     });
     it('should throw a AuthFailureError', async () => {
-      spySanitizeAuthHeader.mockReturnValue('token');
       mockDecodeToken.mockReturnValue('');
       try {
         await authUtils.decodeAccessToken({
@@ -228,12 +228,10 @@ describe('Helper Class: AuthUtils', () => {
         expect(err).toBeInstanceOf(AuthFailureError);
         expect((err as BaseError).type).toBe('AuthFailureError');
         expect((err as BaseError).statusCode).toBe(401);
-        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
         expect(mockDecodeToken).toBeCalledTimes(1);
       }
     });
     it('should throw a AccessTokenError', async () => {
-      spySanitizeAuthHeader.mockReturnValue('token');
       mockDecodeToken.mockImplementation(() => {
         throw new BadTokenError();
       });
@@ -247,7 +245,6 @@ describe('Helper Class: AuthUtils', () => {
         expect(err).toBeInstanceOf(AccessTokenError);
         expect((err as BaseError).type).toBe('AccessTokenError');
         expect((err as BaseError).statusCode).toBe(401);
-        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
         expect(mockDecodeToken).toBeCalledTimes(1);
       }
     });
@@ -312,6 +309,44 @@ describe('Helper Class: AuthUtils', () => {
         expect(err).toBeInstanceOf(InternalServerError);
         expect((err as BaseError).type).toBe('InternalServerError');
         expect((err as BaseError).statusCode).toBe(500);
+      }
+    });
+  });
+  describe('Method: sanitizeAuthHeader', () => {
+    it('should extract the auth token from headers', () => {
+      expect(
+        authUtils.sanitizeAuthHeader({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request)
+      ).toBe('token');
+    });
+    it('should throw a ForbiddenError', () => {
+      try {
+        authUtils.sanitizeAuthHeader({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect((err as BaseError).type).toBe('ForbiddenError');
+        expect((err as BaseError).statusCode).toBe(403);
+      }
+    });
+
+    it("should throw a ForbiddenError if no 'Bearer' is present in header", () => {
+      try {
+        authUtils.sanitizeAuthHeader({
+          get() {
+            return 'token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect((err as BaseError).type).toBe('ForbiddenError');
+        expect((err as BaseError).statusCode).toBe(403);
       }
     });
   });
