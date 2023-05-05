@@ -1,12 +1,19 @@
 import 'reflect-metadata';
-import { mockGenToken, MockJwt } from './mock';
+import { mockGenToken, MockJwt, mockVerifyToken } from './mock';
 import AuthUtils from '../../../../src/helpers/AuthUtils';
-import IAuthUtils from '../../../../src/interfaces/helpers/IAuthUtils';
 import IJsonWebToken from '../../../../src/interfaces/helpers/IJsonWebToken';
 import { randomBytes } from 'crypto';
 import IUser from '../../../../src/interfaces/models/IUser';
-import { InternalServerError } from '../../../../src/helpers/AppError/ApiError';
+import {
+  AccessTokenError,
+  AuthFailureError,
+  BadTokenError,
+  InternalServerError,
+  NoDataError
+} from '../../../../src/helpers/AppError/ApiError';
 import ErrorMsg from '../../../../src/helpers/AppError/errorMessages';
+import { Request } from 'express';
+import BaseError from '../../../../src/helpers/AppError/BaseError';
 
 const user: IUser = {
   id: '1',
@@ -20,17 +27,19 @@ const user: IUser = {
   activityId: '1',
   roleId: '1'
 };
+let authUtils = new AuthUtils(new MockJwt() as IJsonWebToken);
+const spySanitizeAuthHeader = jest.spyOn(authUtils, 'sanitizeAuthHeader');
+const spyVerifyJwtPayload = jest.spyOn(authUtils, 'verifyJwtPayload');
+
 describe('Helper Class: AuthUtils', () => {
   describe('Method: generateAccessToken', () => {
-    let authUtils: IAuthUtils;
     beforeEach(() => {
-      authUtils = new AuthUtils(new MockJwt() as IJsonWebToken);
       mockGenToken.mockClear();
     });
 
     it('should generate access and refresh token', async () => {
       const token = await authUtils.generateTokens(
-        user,
+        user as Required<IUser>,
         randomBytes(64).toString('hex'),
         randomBytes(64).toString('hex')
       );
@@ -44,7 +53,7 @@ describe('Helper Class: AuthUtils', () => {
       mockGenToken.mockReturnValue(null);
       try {
         await authUtils.generateTokens(
-          user,
+          user as Required<IUser>,
           randomBytes(64).toString('hex'),
           randomBytes(64).toString('hex')
         );
@@ -60,7 +69,7 @@ describe('Helper Class: AuthUtils', () => {
       );
       try {
         await authUtils.generateTokens(
-          user,
+          user as Required<IUser>,
           randomBytes(64).toString('hex'),
           randomBytes(64).toString('hex')
         );
@@ -68,6 +77,114 @@ describe('Helper Class: AuthUtils', () => {
         expect(e).toBeInstanceOf(InternalServerError);
         expect((e as Error).message).toBe(ErrorMsg.INTERNAL);
         expect(mockGenToken).toHaveBeenCalledTimes(1);
+      }
+    });
+  });
+
+  describe('Method: verifyAccessToken', () => {
+    beforeEach(() => {
+      spySanitizeAuthHeader.mockClear();
+      mockVerifyToken.mockClear();
+      spyVerifyJwtPayload.mockClear();
+    });
+    it('should verify the token', async () => {
+      spySanitizeAuthHeader.mockReturnValue('token');
+      mockVerifyToken.mockReturnValue({ type: 'JwtPayload' });
+      spyVerifyJwtPayload.mockReturnValue(true);
+      const jwtPayload = await authUtils.verifyAccessToken({
+        get() {
+          return 'Bearer token';
+        }
+      } as unknown as Request);
+      expect(jwtPayload).toStrictEqual({ type: 'JwtPayload' });
+      expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+      expect(spyVerifyJwtPayload).toBeCalledTimes(1);
+      expect(mockVerifyToken).toBeCalledTimes(1);
+    });
+    it('should throw a AuthFailureError', async () => {
+      try {
+        spySanitizeAuthHeader.mockReturnValue('');
+        await authUtils.verifyAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).type).toEqual('AuthFailureError');
+        expect((err as BaseError).statusCode).toEqual(401);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+      }
+    });
+    it('should throw a AuthFailureError', async () => {
+      try {
+        spySanitizeAuthHeader.mockReturnValue('token');
+        mockVerifyToken.mockReturnValue('');
+        await authUtils.verifyAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).type).toEqual('AuthFailureError');
+        expect((err as BaseError).statusCode).toEqual(401);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+        expect(mockVerifyToken).toBeCalledTimes(1);
+      }
+    });
+    it('should throw a AuthFailureError', async () => {
+      try {
+        spySanitizeAuthHeader.mockReturnValue('token');
+        mockVerifyToken.mockReturnValue({ type: 'JwtPayload' });
+        spyVerifyJwtPayload.mockReturnValue(false);
+        await authUtils.verifyAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).type).toEqual('AuthFailureError');
+        expect((err as BaseError).statusCode).toEqual(401);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+        expect(spyVerifyJwtPayload).toBeCalledTimes(1);
+        expect(mockVerifyToken).toBeCalledTimes(1);
+      }
+    });
+    it('should throw a AccessTokenError', async () => {
+      try {
+        spySanitizeAuthHeader.mockImplementation(() => {
+          throw new BadTokenError();
+        });
+        await authUtils.verifyAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(AccessTokenError);
+        expect((err as BaseError).type).toEqual('AccessTokenError');
+        expect((err as BaseError).statusCode).toEqual(401);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+      }
+    });
+    //to test that other errors can pass through the validation.
+    it('should throw a NoDataError', async () => {
+      try {
+        spySanitizeAuthHeader.mockImplementation(() => {
+          throw new NoDataError();
+        });
+        await authUtils.verifyAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(NoDataError);
+        expect((err as BaseError).type).toEqual('NoDataError');
+        expect((err as BaseError).statusCode).toEqual(404);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
       }
     });
   });
