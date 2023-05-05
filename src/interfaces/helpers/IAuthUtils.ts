@@ -4,7 +4,10 @@ import IUser, { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
 
 export default interface IAuthUtils {
+  generateSalt(): Promise<string>;
   generatePassword(password: string, salt?: string): Promise<string>;
+  sanitizeAuthHeader(req: Request): string | undefined;
+  verifyJwtPayload(payload: Record<string, any>): boolean;
   validatePassword(
     enteredPassword: string,
     databaseSavedPassword: Password

@@ -21,7 +21,7 @@ import TYPES from '@ioc/TYPES';
 export default class AuthUtils implements IAuthUtils {
   constructor(@inject(TYPES.JWT) private readonly jwt: IJsonWebToken) {}
 
-  protected async generateSalt(): Promise<string> {
+  public async generateSalt(): Promise<string> {
     return genSalt(passwordHashSaltRound);
   }
 
@@ -47,7 +47,7 @@ export default class AuthUtils implements IAuthUtils {
     return generatedPassword === password;
   }
 
-  private sanitizeAuthHeader(req: Request): string | undefined {
+  public sanitizeAuthHeader(req: Request): string | undefined {
     const authHeader = req.get('Authorization');
     if (!authHeader) throw new ForbiddenError('Authorization Failure');
     else if (!authHeader.match(/^Bearer/))
@@ -57,7 +57,7 @@ export default class AuthUtils implements IAuthUtils {
     else return authHeader.split(' ')[0];
   }
 
-  private verifyJwtPayload(payload: Record<string, any>): boolean {
+  public verifyJwtPayload(payload: Record<string, any>): boolean {
     if (!payload) return false;
     if (!payload.iss || !payload.iat || !payload.sub || !payload.aud)
       return false;
