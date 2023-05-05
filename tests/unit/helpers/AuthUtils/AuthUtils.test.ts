@@ -281,4 +281,17 @@ describe('Helper Class: AuthUtils', () => {
       }
     });
   });
+
+  describe('Method: generatePassword', () => {
+    it('should hash the password even if no salt is provided', async () => {
+      const password = await authUtils.generatePassword('iloveyou1234');
+      expect(password).toBeTruthy();
+    });
+    it('should hash a password by using the salt', async () => {
+      const salt = await authUtils.generateSalt();
+      await expect(
+        authUtils.generatePassword('iloveyou1234', salt)
+      ).resolves.toBeTruthy();
+    });
+  });
 });
