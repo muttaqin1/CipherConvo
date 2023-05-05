@@ -1,5 +1,10 @@
 import 'reflect-metadata';
-import { mockGenToken, MockJwt, mockVerifyToken } from './mock';
+import {
+  mockDecodeToken,
+  mockGenToken,
+  MockJwt,
+  mockVerifyToken
+} from './mock';
 import AuthUtils from '../../../../src/helpers/AuthUtils';
 import IJsonWebToken from '../../../../src/interfaces/helpers/IJsonWebToken';
 import { randomBytes } from 'crypto';
@@ -185,6 +190,94 @@ describe('Helper Class: AuthUtils', () => {
         expect((err as BaseError).type).toEqual('NoDataError');
         expect((err as BaseError).statusCode).toEqual(404);
         expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+      }
+    });
+  });
+  describe('Method: decodeAccessToken', () => {
+    beforeEach(() => {
+      spySanitizeAuthHeader.mockClear();
+      spyVerifyJwtPayload.mockClear();
+      mockDecodeToken.mockClear();
+    });
+    it('should decode the access token', async () => {
+      spySanitizeAuthHeader.mockReturnValue('token');
+      mockDecodeToken.mockReturnValue({ type: 'jwtPayload' });
+      spyVerifyJwtPayload.mockReturnValue(true);
+
+      const jwtPayload = await authUtils.decodeAccessToken({
+        get() {
+          return 'Bearer token';
+        }
+      } as unknown as Request);
+      expect(jwtPayload).toStrictEqual({
+        type: 'jwtPayload'
+      });
+      expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+      expect(mockDecodeToken).toBeCalledTimes(1);
+    });
+    it('should throw a AuthFailureError', async () => {
+      spySanitizeAuthHeader.mockReturnValue('token');
+      mockDecodeToken.mockReturnValue('');
+      try {
+        await authUtils.decodeAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).type).toBe('AuthFailureError');
+        expect((err as BaseError).statusCode).toBe(401);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+        expect(mockDecodeToken).toBeCalledTimes(1);
+      }
+    });
+    it('should throw a AccessTokenError', async () => {
+      spySanitizeAuthHeader.mockReturnValue('token');
+      mockDecodeToken.mockImplementation(() => {
+        throw new BadTokenError();
+      });
+      try {
+        await authUtils.decodeAccessToken({
+          get() {
+            return 'Bearer token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(err).toBeInstanceOf(AccessTokenError);
+        expect((err as BaseError).type).toBe('AccessTokenError');
+        expect((err as BaseError).statusCode).toBe(401);
+        expect(spySanitizeAuthHeader).toBeCalledTimes(1);
+        expect(mockDecodeToken).toBeCalledTimes(1);
+      }
+    });
+  });
+  describe('Method: verifyRefreshToken', () => {
+    beforeEach(() => {
+      mockVerifyToken.mockClear();
+      spyVerifyJwtPayload.mockClear();
+    });
+
+    it('should verify the refresh token', async () => {
+      mockVerifyToken.mockReturnValue({ data: 'data' });
+      spyVerifyJwtPayload.mockReturnValue(true);
+      const token = await authUtils.verifyRefreshToken('refresh token');
+      expect(token).toStrictEqual({
+        data: 'data'
+      });
+      expect(mockVerifyToken).toBeCalledTimes(1);
+      expect(spyVerifyJwtPayload).toBeCalledTimes(1);
+    });
+    it('should throw a AuthFailureError', async () => {
+      mockVerifyToken.mockReturnValue({});
+      try {
+        await authUtils.verifyRefreshToken('refresh token');
+      } catch (err) {
+        console.log(err);
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).type).toBe('AuthFailureError');
+        expect((err as BaseError).statusCode).toBe(401);
+        expect(mockVerifyToken).toBeCalledTimes(1);
       }
     });
   });
