@@ -8,7 +8,7 @@ import {
 import AuthUtils from '../../../../src/helpers/AuthUtils';
 import IJsonWebToken from '../../../../src/interfaces/helpers/IJsonWebToken';
 import { randomBytes } from 'crypto';
-import IUser from '../../../../src/interfaces/models/IUser';
+import IUser, { Password } from '../../../../src/interfaces/models/IUser';
 import {
   AccessTokenError,
   AuthFailureError,
@@ -292,6 +292,27 @@ describe('Helper Class: AuthUtils', () => {
       await expect(
         authUtils.generatePassword('iloveyou1234', salt)
       ).resolves.toBeTruthy();
+    });
+  });
+  describe('Method: validatePassword', () => {
+    it('should validate the password', async () => {
+      const dbSavedpass = await authUtils.generatePassword('iloveyou1234');
+      await expect(
+        authUtils.validatePassword('iloveyou1234', dbSavedpass)
+      ).resolves.toBeTruthy();
+    });
+    it('should throw a InternalServerError', async () => {
+      const dbSavedpass = '';
+      try {
+        await authUtils.validatePassword(
+          'iloveyou1234',
+          dbSavedpass as Password
+        );
+      } catch (err) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect((err as BaseError).type).toBe('InternalServerError');
+        expect((err as BaseError).statusCode).toBe(500);
+      }
     });
   });
 });
