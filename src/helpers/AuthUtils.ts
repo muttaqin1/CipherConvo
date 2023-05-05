@@ -54,7 +54,7 @@ export default class AuthUtils implements IAuthUtils {
       throw new ForbiddenError('Authorization Failure');
     else if (!authHeader.split(' ')[1])
       throw new ForbiddenError('Authorization Failure');
-    else return authHeader.split(' ')[0];
+    else return authHeader.split(' ')[1];
   }
 
   public verifyJwtPayload(payload: Record<string, any>): boolean {
