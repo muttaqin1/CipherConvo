@@ -20,6 +20,7 @@ import {
 import ErrorMsg from '../../../../src/helpers/AppError/errorMessages';
 import { Request } from 'express';
 import BaseError from '../../../../src/helpers/AppError/BaseError';
+import { JWT } from '../../../../src/config/index';
 
 const user: IUser = {
   id: '1',
@@ -348,6 +349,39 @@ describe('Helper Class: AuthUtils', () => {
         expect((err as BaseError).type).toBe('ForbiddenError');
         expect((err as BaseError).statusCode).toBe(403);
       }
+    });
+  });
+  describe('Method verifyJwtPayload', () => {
+    it('should verify the jwt payload', () => {
+      let jwtPayload = {
+        userId: 'id',
+        userName: 'muttaqin1',
+        roleId: 'id',
+        email: 'example@gmail.com',
+        iat: 'iat',
+        iss: JWT.iss,
+        aud: JWT.aud,
+        sub: JWT.sub
+      };
+
+      expect(authUtils.verifyJwtPayload(jwtPayload)).toBeTruthy();
+    });
+    it('should return false if any of the required properties is missing or incorrect', () => {
+      let jwtPayload = {
+        userId: 'id',
+        userName: 'muttaqin1',
+        roleId: 'id',
+        email: 'example@gmail.com',
+        //iss: JWT.iss,
+        iat: 'iat',
+        aud: JWT.aud,
+        sub: JWT.sub
+      };
+
+      expect(authUtils.verifyJwtPayload(jwtPayload)).toBeFalsy();
+    });
+    it('should return false if no payload is provided', () => {
+      expect(authUtils.verifyJwtPayload({})).toBeFalsy();
     });
   });
 });
