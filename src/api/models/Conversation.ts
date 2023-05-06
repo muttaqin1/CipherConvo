@@ -53,7 +53,6 @@ Conversation.init(
   },
   {
     sequelize,
-    paranoid: true,
     tableName: 'conversations',
     freezeTableName: true,
     timestamps: true

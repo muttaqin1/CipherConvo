@@ -55,7 +55,6 @@ Participant.init(
   },
   {
     sequelize,
-    paranoid: true,
     tableName: 'participants',
     freezeTableName: true,
     timestamps: true

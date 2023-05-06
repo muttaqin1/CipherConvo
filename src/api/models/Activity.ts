@@ -91,7 +91,6 @@ Activity.init(
     sequelize,
     tableName: 'activities',
     timestamps: true,
-    paranoid: true,
     freezeTableName: true
   }
 );

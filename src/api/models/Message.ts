@@ -62,7 +62,6 @@ Message.init(
     sequelize,
     tableName: 'messages',
     freezeTableName: true,
-    timestamps: true,
-    paranoid: true
+    timestamps: true
   }
 );
