@@ -19,3 +19,9 @@ export const signupSchema = Joi.object({
   password: JoiPasswordComplexity(complexityOptions).required(),
   confirmPassword: Joi.ref('password')
 });
+
+export const loginSchema = Joi.object({
+  email: Joi.string().email(),
+  userName: Joi.string(),
+  password: JoiPasswordComplexity(complexityOptions).required()
+}).xor('email', 'userName');
