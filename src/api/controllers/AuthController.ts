@@ -18,7 +18,11 @@ import {
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
 import { validateSchema } from '@middlewares/validators/validateSchema';
-import { loginSchema, signupSchema } from '@middlewares/validators/schema/auth';
+import {
+  loginSchema,
+  signupSchema,
+  tokenRefreshSchema
+} from '@middlewares/validators/schema/auth';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -68,7 +72,7 @@ export default class UserController implements IAuthController {
     else apiSuccessResponse.send({ message: 'logout fail' });
   }
 
-  @httpPut('/token-refresh')
+  @httpPut('/token-refresh', validateSchema(tokenRefreshSchema))
   public async tokenRefresh(
     @request() req: Request,
     @response() res: Response

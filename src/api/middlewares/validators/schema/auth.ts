@@ -25,3 +25,7 @@ export const loginSchema = Joi.object({
   userName: Joi.string(),
   password: JoiPasswordComplexity(complexityOptions).required()
 }).xor('email', 'userName');
+
+export const tokenRefreshSchema = Joi.object({
+  refreshToken: Joi.string().required()
+});
