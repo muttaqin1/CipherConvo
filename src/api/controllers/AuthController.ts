@@ -18,7 +18,7 @@ import {
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
 import { validateSchema } from '@middlewares/validators/validateSchema';
-import { signupSchema } from '@middlewares/validators/schema/auth';
+import { loginSchema, signupSchema } from '@middlewares/validators/schema/auth';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -26,7 +26,7 @@ export default class UserController implements IAuthController {
     @inject(TYPES.AuthService) private readonly authService: IAuthService
   ) {}
 
-  @httpPost('/login')
+  @httpPost('/login', validateSchema(loginSchema))
   public async login(
     @request() req: Request,
     @response() res: Response
