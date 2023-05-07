@@ -12,8 +12,8 @@ export type notChangeable =
   | 'deletedAt';
 
 export interface UserIncludedRolesAndActivities extends userOutput {
-  roles: roleOutput | null;
-  activities: activityOutput | null;
+  roles?: roleOutput;
+  activities?: activityOutput;
 }
 export default interface IUserRepository {
   createUser(user: userInput): Promise<userOutput | null>;

@@ -17,6 +17,8 @@ import {
   httpPut
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
+import { validateSchema } from '@middlewares/validators/validateSchema';
+import { signupSchema } from '@middlewares/validators/schema/auth';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -38,7 +40,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send<loginResponse>(responseData);
   }
 
-  @httpPost('/signup')
+  @httpPost('/signup', validateSchema(signupSchema))
   public async signup(@request() req: Request, @response() res: Response) {
     const { userName, firstName, lastName, email, password, gender, avatar } =
       req.body;

@@ -8,7 +8,7 @@ import { injectable } from 'inversify';
 
 export type userInput = Optional<
   IUser,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'avatar'
 >;
 export type userOutput = Required<IUser>;
 

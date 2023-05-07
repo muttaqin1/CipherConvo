@@ -124,7 +124,7 @@ export default class AuthService implements IAuthService {
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
     // remove password and activities from user object.
-    user.activities = null;
+    user.activities = undefined;
     user.password = null;
     return {
       user,
