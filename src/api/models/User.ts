@@ -8,7 +8,7 @@ import { injectable } from 'inversify';
 
 export type userInput = Optional<
   IUser,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'roleId' | 'activityId'
+  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
 >;
 export type userOutput = Required<IUser>;
 
@@ -77,8 +77,6 @@ User.init(
       }
     },
     password: DataTypes.STRING,
-    activityId: DataTypes.UUID,
-    roleId: DataTypes.UUID,
     avatar: {
       type: DataTypes.STRING,
       defaultValue: 'default.png'

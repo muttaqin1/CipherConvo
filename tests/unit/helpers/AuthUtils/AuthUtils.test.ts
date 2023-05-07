@@ -21,6 +21,7 @@ import ErrorMsg from '../../../../src/helpers/AppError/errorMessages';
 import { Request } from 'express';
 import BaseError from '../../../../src/helpers/AppError/BaseError';
 import { JWT } from '../../../../src/config/index';
+import IRole from '../../../../src/interfaces/models/IRole';
 
 const user: IUser = {
   id: '1',
@@ -30,9 +31,14 @@ const user: IUser = {
   password: 'password:password',
   gender: 'male',
   userName: 'john',
-  avatar: 'avatar',
-  activityId: '1',
-  roleId: '1'
+  avatar: 'avatar'
+};
+const role: IRole = {
+  admin: false,
+  user: true,
+  id: '1',
+  userId: '1',
+  createdAt: new Date()
 };
 let authUtils = new AuthUtils(new MockJwt() as IJsonWebToken);
 let spySanitizeAuthHeader = jest.spyOn(authUtils, 'sanitizeAuthHeader');
@@ -44,7 +50,6 @@ describe('Helper Class: AuthUtils', () => {
       let jwtPayload = {
         userId: 'id',
         userName: 'muttaqin1',
-        roleId: 'id',
         email: 'example@gmail.com',
         iat: 'iat',
         iss: JWT.iss,
@@ -58,7 +63,6 @@ describe('Helper Class: AuthUtils', () => {
       let jwtPayload = {
         userId: 'id',
         userName: 'muttaqin1',
-        roleId: 'id',
         email: 'example@gmail.com',
         //iss: JWT.iss,
         iat: 'iat',
@@ -81,6 +85,7 @@ describe('Helper Class: AuthUtils', () => {
     it('should generate access and refresh token', async () => {
       const token = await authUtils.generateTokens(
         user as Required<IUser>,
+        role as Required<IRole>,
         randomBytes(64).toString('hex'),
         randomBytes(64).toString('hex')
       );
@@ -95,6 +100,7 @@ describe('Helper Class: AuthUtils', () => {
       try {
         await authUtils.generateTokens(
           user as Required<IUser>,
+          role as Required<IRole>,
           randomBytes(64).toString('hex'),
           randomBytes(64).toString('hex')
         );
@@ -111,6 +117,7 @@ describe('Helper Class: AuthUtils', () => {
       try {
         await authUtils.generateTokens(
           user as Required<IUser>,
+          role as Required<IRole>,
           randomBytes(64).toString('hex'),
           randomBytes(64).toString('hex')
         );

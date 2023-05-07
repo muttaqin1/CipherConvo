@@ -16,6 +16,7 @@ import IUser, { Password } from '@interfaces/models/IUser';
 import { TokenExpiredError } from 'jsonwebtoken';
 import JwtPayload from '@interfaces/auth/JwtPayload';
 import TYPES from '@ioc/TYPES';
+import IRole from '@interfaces/models/IRole';
 
 @injectable()
 export default class AuthUtils implements IAuthUtils {
@@ -101,6 +102,7 @@ export default class AuthUtils implements IAuthUtils {
 
   public async generateTokens(
     user: Required<IUser>,
+    role: Required<IRole>,
     accessTokenKey: string,
     refreshTokenKey: string
   ): Promise<IToken> {
@@ -108,7 +110,7 @@ export default class AuthUtils implements IAuthUtils {
       userId: user.id,
       email: user.email,
       userName: user.userName,
-      roleId: user.roleId as string
+      roleId: role.id
     } as const;
     try {
       const accessToken = await this.generateAccessToken({

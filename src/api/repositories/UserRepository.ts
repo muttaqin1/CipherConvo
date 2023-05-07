@@ -89,15 +89,4 @@ export default class UserRepository implements IUserRepository {
   public deleteUser(id: string): Promise<number> {
     return this.userModel.destroy({ where: { id } });
   }
-
-  public setRoleAndActivityId(
-    userId: string,
-    roleId: string,
-    activityId: string
-  ): Promise<[affectedCount: number]> {
-    return this.userModel.update(
-      { roleId, activityId },
-      { where: { id: userId } }
-    );
-  }
 }

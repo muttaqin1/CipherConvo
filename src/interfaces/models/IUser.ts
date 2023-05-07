@@ -8,8 +8,6 @@ export default interface IUser {
   email: string;
   password: Password | null;
   gender: string;
-  activityId: string | null;
-  roleId: string | null;
   avatar: string;
   createdAt?: Date;
   updatedAt?: Date;

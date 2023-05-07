@@ -1,5 +1,6 @@
 import IToken from '@interfaces/auth/IToken';
 import JwtPayload from '@interfaces/auth/JwtPayload';
+import IRole from '@interfaces/models/IRole';
 import IUser, { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
 
@@ -13,7 +14,8 @@ export default interface IAuthUtils {
     databaseSavedPassword: Password
   ): Promise<boolean>;
   generateTokens(
-    user: IUser,
+    user: Required<IUser>,
+    role: Required<IRole>,
     accessTokenKey: string,
     refreshTokenKey: string
   ): Promise<IToken>;

@@ -23,6 +23,7 @@ import IActivityRepository from '@interfaces/repository/IActivityRepository';
 import IRoleRepository from '@interfaces/repository/IRoleRepository';
 import { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
+import IRole from '@interfaces/models/IRole';
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -45,13 +46,20 @@ export default class AuthService implements IAuthService {
     let user;
     // check if the user is registered with the provided email or username.
     if (email)
-      user = await this.userRepo.findUserByEmail(email, { activity: true });
+      user = await this.userRepo.findUserByEmail(email, {
+        role: true,
+        activity: true
+      });
     else if (userName)
-      user = await this.userRepo.findByUsername(userName, { activity: true });
+      user = await this.userRepo.findByUsername(userName, {
+        role: true,
+        activity: true
+      });
     else throw new BadRequestError('Please provide email or username');
     // If no user is registered with the provided email or username, throw an error.
     if (!user) throw new ForbiddenError('User not found');
     if (!user.password) throw new ForbiddenError('Missing user credentials');
+    if (!user.roles) throw new ForbiddenError('Missing user credentials');
     // If the account is permanently restricted, throw an error.
     if (user.activities && user.activities.permanentAccessRestricted)
       throw new ForbiddenError(
@@ -109,14 +117,15 @@ export default class AuthService implements IAuthService {
     // generating access token and refresh token.
     const tokens = await this.authUtils.generateTokens(
       user,
+      user.roles,
       accessTokenKey,
       refreshTokenKey
     );
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
     // remove password and activities from user object.
-    user.password = null;
     user.activities = null;
+    user.password = null;
     return {
       user,
       tokens
@@ -142,7 +151,7 @@ export default class AuthService implements IAuthService {
     });
     if (!user) throw new InternalServerError('Failed to create user');
     // create new activity for the user.
-    const activity = await this.activityRepo.createActivity({
+    await this.activityRepo.createActivity({
       userId: user.id
     });
     // create new role for the user.
@@ -151,8 +160,6 @@ export default class AuthService implements IAuthService {
       admin: false,
       user: true
     });
-    // set role and activity id in user table.
-    this.userRepo.setRoleAndActivityId(user.id, role.id, activity.id);
     // Generate new access token and refresh token keys.
     const accessTokenKey = randomBytes(64).toString('hex');
     const refreshTokenKey = randomBytes(64).toString('hex');
@@ -166,6 +173,7 @@ export default class AuthService implements IAuthService {
     // generating access token and refresh token.
     const tokens = await this.authUtils.generateTokens(
       user,
+      role,
       accessTokenKey,
       refreshTokenKey
     );
@@ -195,7 +203,9 @@ export default class AuthService implements IAuthService {
     const accessTokenPayload = await this.authUtils.decodeAccessToken(req);
     if (!accessTokenPayload) throw new AuthFailureError('Invalid Token');
     // find the user with the id provided in the access token.
-    const user = await this.userRepo.findUserById(accessTokenPayload.id);
+    const user = await this.userRepo.findUserById(accessTokenPayload.id, {
+      role: true
+    });
     if (!user) throw new ForbiddenError('User not found');
     // verify the refresh token.
     const refreshTokenPayload = await this.authUtils.verifyRefreshToken(
@@ -229,6 +239,7 @@ export default class AuthService implements IAuthService {
     // generating access token and refresh token.
     const tokens = await this.authUtils.generateTokens(
       user,
+      user.roles as Required<IRole>,
       accessTokenKey,
       refreshTokenKey
     );
