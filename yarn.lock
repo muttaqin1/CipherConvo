@@ -3535,6 +3535,11 @@ jest@29.5.0:
     import-local "^3.0.2"
     jest-cli "^29.5.0"
 
+joi-password-complexity@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/joi-password-complexity/-/joi-password-complexity-5.1.0.tgz#7506d3adce429d52c1331910f20fd5f571c273d1"
+  integrity sha512-2F/cPybttJGuyVmZ8X/yihemshhAuFt4fHGlz8CFNP7R8PzH90K8OeNzY9RrdADM6uu3D2xTXej/odvRjdkqaw==
+
 joi@17.8.3:
   version "17.8.3"
   resolved "https://registry.yarnpkg.com/joi/-/joi-17.8.3.tgz#d772fe27a87a5cda21aace5cf11eee8671ca7e6f"

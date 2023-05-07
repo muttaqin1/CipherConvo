@@ -15,9 +15,9 @@ POST /api/v1/auth/signup
 "firstName":"muttaqin",
 "lastName":"muhammad",
 "email":"example@gmail.com",
-"password":"12345678",
-"gender":"male",
-"avatar":"https://www.example.com/images/avatar.png"
+"password":"SequredPass@1234",
+"confirmPassword": "SequredPass@1234",
+"gender":"male"
 }
 
 --
@@ -25,7 +25,7 @@ POST /api/v1/auth/signup
 POST /api/v1/auth/login
 {
 "email":"example@gmail.com",
-"password":"12345678"
+"password":"SequredPass@1234"
 }
 --
 # logout

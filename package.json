@@ -58,6 +58,7 @@
     "inversify": "6.0.1",
     "inversify-express-utils": "6.4.3",
     "joi": "17.8.3",
+    "joi-password-complexity": "5.1.0",
     "jsonwebtoken": "9.0.0",
     "lodash": "4.17.21",
     "luxon": "3.2.1",
