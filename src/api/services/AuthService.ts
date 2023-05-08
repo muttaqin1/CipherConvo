@@ -123,11 +123,19 @@ export default class AuthService implements IAuthService {
     );
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
-    // remove password and activities from user object.
-    user.activities = undefined;
-    user.password = null;
     return {
-      user,
+      user: {
+        id: user.id,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        email: user.email,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      },
+      roles: user.roles,
       tokens
     };
   }
@@ -192,8 +200,8 @@ export default class AuthService implements IAuthService {
     try {
       await this.authTokenKeysRepo.deleteKeys(user.id);
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      throw new InternalServerError('logout fail');
     }
   }
 

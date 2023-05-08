@@ -66,10 +66,8 @@ export default class UserController implements IAuthController {
     @request() req: Request,
     @response() res: Response
   ): Promise<void> {
-    const bool = await this.authService.logout(req.user);
-    const apiSuccessResponse = new ApiSuccessResponse(res);
-    if (bool) apiSuccessResponse.send({ message: 'logout success' });
-    else apiSuccessResponse.send({ message: 'logout fail' });
+    await this.authService.logout(req.user);
+    new ApiSuccessResponse(res).send({ message: 'logout success' });
   }
 
   @httpPut('/token-refresh', validateSchema(tokenRefreshSchema))

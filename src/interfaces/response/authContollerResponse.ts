@@ -4,6 +4,7 @@ import IToken from '@interfaces/auth/IToken';
 
 export interface loginResponse {
   user: Omit<Required<IUser>, 'password'>;
+  roles: Required<IRole>;
   tokens: IToken;
 }
 export interface singupResponse {
