@@ -20,8 +20,6 @@ export default class Role
   public createdAt!: Date;
 
   public updatedAt!: Date;
-
-  public deletedAt!: Date;
 }
 
 Role.init(
@@ -42,8 +40,7 @@ Role.init(
     },
     userId: DataTypes.UUID,
     createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    deletedAt: DataTypes.DATE
+    updatedAt: DataTypes.DATE
   },
   {
     sequelize,

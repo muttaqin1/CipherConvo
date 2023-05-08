@@ -6,7 +6,7 @@ import { injectable } from 'inversify';
 
 export type activityInput = Optional<
   IActivity,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
+  'id' | 'createdAt' | 'updatedAt'
 >;
 export type activityOutput = Required<IActivity>;
 
@@ -38,8 +38,6 @@ export default class Activity
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
-
-  public readonly deletedAt!: Date;
 }
 
 Activity.init(
@@ -84,8 +82,7 @@ Activity.init(
       defaultValue: null
     },
     createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    deletedAt: DataTypes.DATE
+    updatedAt: DataTypes.DATE
   },
   {
     sequelize,

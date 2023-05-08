@@ -8,7 +8,7 @@ import { injectable } from 'inversify';
 
 export type userInput = Optional<
   IUser,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'avatar'
+  'id' | 'createdAt' | 'updatedAt' | 'avatar'
 >;
 export type userOutput = Required<IUser>;
 
@@ -40,8 +40,6 @@ export default class User
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
-
-  public readonly deletedAt!: Date;
 }
 
 User.init(
@@ -82,8 +80,7 @@ User.init(
       defaultValue: 'default.png'
     },
     createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    deletedAt: DataTypes.DATE
+    updatedAt: DataTypes.DATE
   },
   {
     tableName: 'users',

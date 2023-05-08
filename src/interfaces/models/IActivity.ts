@@ -11,5 +11,4 @@ export default interface IActivity {
   twoFactorAuthRestrictedUntil?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }

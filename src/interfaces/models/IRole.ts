@@ -5,5 +5,4 @@ export default interface IRole {
   userId: string;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }

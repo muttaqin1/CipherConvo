@@ -11,5 +11,4 @@ export default interface IUser {
   avatar: string;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date;
 }
