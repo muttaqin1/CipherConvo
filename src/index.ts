@@ -17,6 +17,7 @@ import { sequelize } from '@database/index';
 import sync from '@database/sync';
 import '@middlewares/notFoundHandler';
 import '@controllers/AuthController';
+import { apiLimiter } from '@middlewares/rateLimit';
 
 // handle uncaughtException and exit the application with code 1.
 process.on('uncaughtException', (err) => {
@@ -25,6 +26,7 @@ process.on('uncaughtException', (err) => {
 });
 
 const expressApp = express();
+expressApp.use('/api', apiLimiter);
 expressApp.use(express.json());
 expressApp.use((req, _, next) => {
   if (req.method.toUpperCase() !== 'GET' || !IsProduction)
