@@ -35,6 +35,7 @@ export const deserializeUser = async (
     if (!keys) throw new AuthFailureError();
     // set user to req
     req.user = user;
+    next();
   } catch (e) {
     next(e);
   }

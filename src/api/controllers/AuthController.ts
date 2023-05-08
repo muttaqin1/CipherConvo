@@ -17,12 +17,13 @@ import {
   httpPut
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
-import { validateSchema } from '@middlewares/validators/validateSchema';
+import { validateSchema as validate } from '@middlewares/validators/validateSchema';
 import {
   loginSchema,
   signupSchema,
   tokenRefreshSchema
 } from '@middlewares/validators/schema/auth';
+import { deserializeUser } from '@auth/deserializeUser';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -30,7 +31,7 @@ export default class UserController implements IAuthController {
     @inject(TYPES.AuthService) private readonly authService: IAuthService
   ) {}
 
-  @httpPost('/login', validateSchema(loginSchema))
+  @httpPost('/login', validate(loginSchema))
   public async login(
     @request() req: Request,
     @response() res: Response
@@ -44,7 +45,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send<loginResponse>(responseData);
   }
 
-  @httpPost('/signup', validateSchema(signupSchema))
+  @httpPost('/signup', validate(signupSchema))
   public async signup(@request() req: Request, @response() res: Response) {
     const { userName, firstName, lastName, email, password, gender, avatar } =
       req.body;
@@ -61,7 +62,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send<singupResponse>(responseData);
   }
 
-  @httpDelete('/logout')
+  @httpDelete('/logout', deserializeUser)
   public async logout(
     @request() req: Request,
     @response() res: Response
@@ -70,7 +71,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send({ message: 'logout success' });
   }
 
-  @httpPut('/token-refresh', validateSchema(tokenRefreshSchema))
+  @httpPut('/token-refresh', deserializeUser, validate(tokenRefreshSchema))
   public async tokenRefresh(
     @request() req: Request,
     @response() res: Response

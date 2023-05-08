@@ -1,8 +1,8 @@
 {
-  "name": "chat-application-rest-api",
+  "name": "cypherconv",
   "version": "1.0.0",
   "main": "./dist/index.js",
-  "repository": "git@github.com:muttaqin1/Chat-application-Rest-API.git",
+  "repository": "git@github.com:muttaqin1/CypherConv.git",
   "author": "muttaqin1 <mdmuttaqin20@gmail.com>",
   "license": "MIT",
   "scripts": {
