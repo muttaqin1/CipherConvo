@@ -14,3 +14,15 @@ export const apiLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
+
+export const signupLimiter = rateLimit({
+  windowMs: 1000 * 60 * 60, // 1 hour window
+  max: 5, // start blocking after 5 requests
+  handler: (_req, _res, next) => {
+    next(
+      new ForbiddenError(
+        'Too many accounts created from this IP, please try again after an hour'
+      )
+    );
+  }
+});

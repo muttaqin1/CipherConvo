@@ -24,6 +24,7 @@ import {
   tokenRefreshSchema
 } from '@middlewares/validators/schema/auth';
 import { deserializeUser } from '@auth/deserializeUser';
+import { signupLimiter } from '@middlewares/rateLimit';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -45,7 +46,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send<loginResponse>(responseData);
   }
 
-  @httpPost('/signup', validate(signupSchema))
+  @httpPost('/signup', signupLimiter, validate(signupSchema))
   public async signup(@request() req: Request, @response() res: Response) {
     const { userName, firstName, lastName, email, password, gender, avatar } =
       req.body;
