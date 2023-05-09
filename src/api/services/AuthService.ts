@@ -58,15 +58,15 @@ export default class AuthService implements IAuthService {
     else throw new BadRequestError('Please provide email or username');
     // If no user is registered with the provided email or username, throw an error.
     if (!user) throw new ForbiddenError('User not found');
-    if (!user.password) throw new ForbiddenError('Missing user credentials');
-    if (!user.roles) throw new ForbiddenError('Missing user credentials');
+    if (!user.password || !user.roles || !user.activities)
+      throw new ForbiddenError('Missing user credentials');
     // If the account is permanently restricted, throw an error.
-    if (user.activities && user.activities.permanentAccessRestricted)
+    if (user.activities.permanentAccessRestricted)
       throw new ForbiddenError(
         'Account permanently banned. Contact support for more information.'
       );
     // If the account access restricted, throw an error.
-    if (user.activities && user.activities.accessRestricted)
+    if (user.activities.accessRestricted)
       throw new ForbiddenError(
         'Access restricted. Verify yourself to continue.'
       );
@@ -77,7 +77,6 @@ export default class AuthService implements IAuthService {
     );
     // If password is not valid, throw an error.
     if (!isValidPass) {
-      if (!user.activities) throw new ForbiddenError();
       // If the failed login attempts count is greater or equal to 8 restrict the account.
       if (user.activities.failedLoginAttempts >= 8) {
         // restrict the account.
