@@ -1,7 +1,7 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   preset: 'ts-jest',
-  displayName: 'Chat-application-rest-api-tests',
+  displayName: 'CipherConvo-api-tests',
   moduleNameMapper: {
     '^@helpers/(.*)$': '<rootDir>/src/helpers/$1',
     '^@config/(.*)$': '<rootDir>/src/config/$1',
