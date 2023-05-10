@@ -26,3 +26,9 @@ export const JWT = {
     Number(process.env.JWT_REFRESH_TOKEN_EXPIRY) || 1000 * 60 * 60 * 24 * 30
 } as const;
 export const corsURL = process.env.CORS_URL || 'http://localhost:3000';
+export const smtp = {
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT) || 465,
+  email: process.env.SMTP_EMAIL || null,
+  password: process.env.SMTP_PASSWORD || null
+};
