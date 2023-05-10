@@ -18,7 +18,7 @@ export default class TwoFactorAuthToken
 
   public tokenType!: string;
 
-  public tokenExpiry!: number;
+  public tokenExpiry!: Date;
 
   public createdAt!: Date;
 

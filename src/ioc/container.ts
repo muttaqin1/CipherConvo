@@ -17,6 +17,11 @@ import IActivityRepository from '@interfaces/repository/IActivityRepository';
 import IRoleRepository from '@interfaces/repository/IRoleRepository';
 import ActivityRepository from '@repositories/ActivityRepository';
 import RoleRepository from '@repositories/RoleRepository';
+import IEmailService from '@interfaces/service/IEmailService';
+import EmailService from '@services/EmailService';
+import TwoFactorAuthToken from '@models/TwoFactorAuthToken';
+import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';
+import TwoFactorAuthTokenRepository from '@repositories/TwoFactorAuthTokenRepository';
 /**
  * @description Container for dependency injection using inversify
  * @export container - Container instance for dependency injection
@@ -29,6 +34,9 @@ container
   .toConstantValue(AuthTokenKeys);
 container.bind<typeof Role>(TYPES.RoleModel).toConstantValue(Role);
 container.bind<typeof Activity>(TYPES.ActivityModel).toConstantValue(Activity);
+container
+  .bind<typeof TwoFactorAuthToken>(TYPES.TwoFactorAuthToken)
+  .toConstantValue(TwoFactorAuthToken);
 
 // repositories
 container
@@ -52,6 +60,14 @@ container
 container
   .bind<IAuthService>(TYPES.AuthService)
   .to(AuthService)
+  .inSingletonScope();
+container
+  .bind<IEmailService>(TYPES.EmailService)
+  .to(EmailService)
+  .inSingletonScope();
+container
+  .bind<ITwoFactorAuthTokenRepository>(TYPES.TwoFactorAuthTokenRepository)
+  .to(TwoFactorAuthTokenRepository)
   .inSingletonScope();
 
 // helpers

@@ -9,6 +9,9 @@ const TYPES = {
   RoleRepository: Symbol('RoleRepository'),
   AuthService: Symbol('AuthService'),
   JWT: Symbol('JWT'),
-  AuthUtils: Symbol('AuthUtils')
+  AuthUtils: Symbol('AuthUtils'),
+  EmailService: Symbol('EmailService'),
+  TwoFactorAuthToken: Symbol('TwoFactorAuthToken'),
+  TwoFactorAuthTokenRepository: Symbol('TwoFactorAuthTokenRepository')
 };
 export default TYPES;

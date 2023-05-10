@@ -3,7 +3,7 @@ export default interface ITwoFactorAuthToken {
   userId: string;
   token: string;
   tokenType: string;
-  tokenExpiry: number;
+  tokenExpiry: Date;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
