@@ -8,7 +8,7 @@ export default interface ITwoFactorAuthTokenRepository {
   createToken(
     tokenData: twoFactorAuthTokenInput
   ): Promise<twoFactorAuthTokenOutput>;
-  deleteToken(userId: string): Promise<void>;
+  deleteToken(userId: string): Promise<number>;
   findTokenByToken(token: string): Promise<twoFactorAuthTokenOutput | null>;
   verifyToken(token: string): Promise<void>;
 }

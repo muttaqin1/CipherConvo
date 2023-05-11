@@ -29,8 +29,8 @@ export default class TwoFactorAuthTokenRepository
     return this.TwoFactorAuthTokenModel.create(tokenData);
   }
 
-  public async deleteToken(userId: string): Promise<void> {
-    this.TwoFactorAuthTokenModel.destroy({
+  public async deleteToken(userId: string): Promise<number> {
+    return this.TwoFactorAuthTokenModel.destroy({
       where: { userId }
     });
   }
