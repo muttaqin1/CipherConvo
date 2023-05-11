@@ -18,7 +18,10 @@ import {
   httpGet
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
-import { validateSchema as validate } from '@middlewares/validators/validateSchema';
+import {
+  validateSchema as validate,
+  validateParamSchema as validateParams
+} from '@middlewares/validators/validateSchema';
 import {
   emailSchema,
   loginSchema,
@@ -107,7 +110,19 @@ export default class UserController implements IAuthController {
     });
   }
 
-  @httpGet('/verify-verification-token/:token', validate(tokenSchema))
+  @httpPost('/forgot-password', validate(emailSchema))
+  public async forgotPassword(
+    @request() req: Request,
+    @response() res: Response
+  ) {
+    const { email } = req.body;
+    await this.emailService.sendForgotPasswordVerificationEmail(email);
+    new ApiSuccessResponse(res).send({
+      message: 'A verification email has been sended to your email account.'
+    });
+  }
+
+  @httpGet('/verify-verification-token/:token', validateParams(tokenSchema))
   public async verifyVerificationToken(
     @request() req: Request,
     @response() res: Response
@@ -117,5 +132,18 @@ export default class UserController implements IAuthController {
       token as string
     );
     new ApiSuccessResponse(res).send(result);
+  }
+
+  @httpPost('/reset-password/:token', validateParams(tokenSchema))
+  public async resetPassword(
+    @request() req: Request,
+    @response() res: Response
+  ) {
+    const { token } = req.params;
+    const { password } = req.body;
+    await this.authService.resetPassword(token as string, password);
+    new ApiSuccessResponse(res).send({
+      message: 'Password reset successfully.'
+    });
   }
 }
