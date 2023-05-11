@@ -25,11 +25,13 @@ import {
 } from '@middlewares/validators/schema/auth';
 import { deserializeUser } from '@auth/deserializeUser';
 import { signupLimiter } from '@middlewares/rateLimit';
+import IEmailService from '@interfaces/service/IEmailService';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
   constructor(
-    @inject(TYPES.AuthService) private readonly authService: IAuthService
+    @inject(TYPES.AuthService) private readonly authService: IAuthService,
+    @inject(TYPES.EmailService) private readonly emailService: IEmailService
   ) {}
 
   @httpPost('/login', validate(loginSchema))
@@ -79,5 +81,17 @@ export default class UserController implements IAuthController {
   ): Promise<void> {
     const responseData = await this.authService.refreshAccessToken(req);
     new ApiSuccessResponse(res).send(responseData);
+  }
+
+  @httpPost('/verify-account')
+  public async verifyAccount(
+    @request() req: Request,
+    @response() res: Response
+  ) {
+    const { email } = req.body;
+    await this.emailService.sendAccountVerificationEmail(email);
+    new ApiSuccessResponse(res).send({
+      message: 'A verification email has been sended to your email account.'
+    });
   }
 }
