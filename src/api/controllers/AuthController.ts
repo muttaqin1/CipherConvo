@@ -20,14 +20,15 @@ import {
 import IAuthController from '@interfaces/controller/IAuthController';
 import { validateSchema as validate } from '@middlewares/validators/validateSchema';
 import {
+  emailSchema,
   loginSchema,
   signupSchema,
-  tokenRefreshSchema
+  tokenRefreshSchema,
+  tokenSchema
 } from '@middlewares/validators/schema/auth';
 import { deserializeUser } from '@auth/deserializeUser';
 import { signupLimiter } from '@middlewares/rateLimit';
 import IEmailService from '@interfaces/service/IEmailService';
-import { BadRequestError } from '@helpers/AppError/ApiError';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -85,7 +86,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send(responseData);
   }
 
-  @httpPost('/verify-account')
+  @httpPost('/verify-account', validate(emailSchema))
   public async verifyAccount(
     @request() req: Request,
     @response() res: Response
@@ -97,7 +98,7 @@ export default class UserController implements IAuthController {
     });
   }
 
-  @httpPost('/verify-email')
+  @httpPost('/verify-email', validate(emailSchema))
   public async verifyEmail(@request() req: Request, @response() res: Response) {
     const { email } = req.body;
     await this.emailService.sendEmailVerificationEmail(email);
@@ -106,7 +107,7 @@ export default class UserController implements IAuthController {
     });
   }
 
-  @httpGet('/verify-verification-token/:token')
+  @httpGet('/verify-verification-token/:token', validate(tokenSchema))
   public async verifyVerificationToken(
     @request() req: Request,
     @response() res: Response
