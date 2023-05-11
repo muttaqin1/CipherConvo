@@ -14,3 +14,16 @@ export const validateSchema = (schema: ObjectSchema) => {
     }
   };
 };
+export const validateParamSchema = (schema: ObjectSchema) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error } = schema.validate(req.params);
+    const valid = error == null;
+    if (valid) {
+      next();
+    } else {
+      const { details } = error;
+      const message = details.map((i) => i.message).join(',');
+      res.status(422).json({ error: message });
+    }
+  };
+};
