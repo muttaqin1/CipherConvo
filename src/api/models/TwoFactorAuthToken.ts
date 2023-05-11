@@ -18,6 +18,8 @@ export default class TwoFactorAuthToken
 
   public tokenType!: string;
 
+  public verified!: boolean;
+
   public tokenExpiry!: Date;
 
   public createdAt!: Date;
@@ -45,6 +47,10 @@ TwoFactorAuthToken.init(
     },
     tokenType: {
       type: DataTypes.STRING,
+      allowNull: false
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
       allowNull: false
     },
     userId: {
