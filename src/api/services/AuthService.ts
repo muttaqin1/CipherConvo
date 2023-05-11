@@ -24,6 +24,8 @@ import IRoleRepository from '@interfaces/repository/IRoleRepository';
 import { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
 import IRole from '@interfaces/models/IRole';
+import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';
+import { TokenType } from '@interfaces/models/ITwoFactorAuthToken';
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -34,7 +36,9 @@ export default class AuthService implements IAuthService {
     private readonly authTokenKeysRepo: IAuthTokenKeysRepository,
     @inject(TYPES.ActivityRepository)
     private readonly activityRepo: IActivityRepository,
-    @inject(TYPES.RoleRepository) private readonly roleRepo: IRoleRepository
+    @inject(TYPES.RoleRepository) private readonly roleRepo: IRoleRepository,
+    @inject(TYPES.TwoFactorAuthTokenRepository)
+    private readonly twoFactorAuthTokenRepo: ITwoFactorAuthTokenRepository
   ) {}
 
   public async login(loginCredentials: {
@@ -253,5 +257,52 @@ export default class AuthService implements IAuthService {
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
     return tokens;
+  }
+
+  public async verifyVerificationToken(token: string): Promise<{
+    emailVerified?: boolean;
+    accountVerified?: boolean;
+    tokenId?: string;
+  }> {
+    const tokenData = await this.twoFactorAuthTokenRepo.findTokenByToken(token);
+    if (!tokenData) throw new BadRequestError('Invalid Token');
+    const user = await this.userRepo.findUserById(tokenData.userId, {
+      activity: true
+    });
+    if (!user) throw new BadRequestError('Invalid Token');
+    if (!user.activities) throw new ForbiddenError();
+    if (
+      tokenData.tokenType === TokenType.VERIFY_ACCOUNT &&
+      !user.activities.accessRestricted
+    )
+      throw new BadRequestError('Account already verified');
+    if (
+      user.activities.emailVerified &&
+      tokenData.tokenType === TokenType.VERIFY_EMAIL
+    )
+      throw new BadRequestError('Email already verified');
+    if (tokenData.tokenType === TokenType.VERIFY_EMAIL) {
+      await this.activityRepo.updateActivity(user.id, { emailVerified: true });
+      await this.twoFactorAuthTokenRepo.deleteToken(user.id);
+      return {
+        emailVerified: true
+      };
+    }
+    if (tokenData.tokenType === TokenType.VERIFY_ACCOUNT) {
+      await this.activityRepo.updateActivity(user.id, {
+        accessRestricted: false
+      });
+      await this.twoFactorAuthTokenRepo.deleteToken(user.id);
+      return {
+        accountVerified: true
+      };
+    }
+    if (tokenData.tokenType === TokenType.RESET_PASSWORD) {
+      await this.twoFactorAuthTokenRepo.verifyToken(token);
+      return {
+        tokenId: tokenData.id
+      };
+    }
+    throw new ForbiddenError();
   }
 }
