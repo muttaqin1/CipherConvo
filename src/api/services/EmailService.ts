@@ -106,4 +106,26 @@ export default class EmailService implements IEmailService {
       else throw new InternalServerError();
     }
   }
+
+  public async sendForgotPasswordVerificationEmail(
+    email: string
+  ): Promise<void> {
+    try {
+      const user = await this.userRepository.findUserByEmail(email, {
+        activity: true
+      });
+      if (!user || !user.activities)
+        throw new AuthFailureError('User not found');
+      const token = await this.generateVerificationToken(
+        user.id,
+        TokenType.RESET_PASSWORD
+      );
+      const subject = 'Verify your email';
+      const text = `Please verify your email by clicking the link: ${clientURL}/api/v1/auth/verify-verification-token/${token}`;
+      this.sendEmail(email, subject, text);
+    } catch (err) {
+      if (IsApiError(err)) throw err;
+      else throw new InternalServerError();
+    }
+  }
 }

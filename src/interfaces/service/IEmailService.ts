@@ -2,4 +2,5 @@
 export default interface IEmailService {
   sendAccountVerificationEmail(email: string): Promise<void>;
   sendEmailVerificationEmail(email: string): Promise<void>;
+  sendForgotPasswordVerificationEmail(email: string): Promise<void>;
 }
