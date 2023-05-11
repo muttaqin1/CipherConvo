@@ -42,4 +42,11 @@ export default class TwoFactorAuthTokenRepository
       where: { token }
     });
   }
+
+  public async verifyToken(token: string): Promise<void> {
+    await this.TwoFactorAuthTokenModel.update(
+      { verified: true },
+      { where: { token } }
+    );
+  }
 }
