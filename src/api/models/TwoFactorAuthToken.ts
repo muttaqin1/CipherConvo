@@ -62,7 +62,6 @@ TwoFactorAuthToken.init(
     sequelize,
     tableName: 'two_factor_auth_tokens',
     timestamps: true,
-    paranoid: true,
     freezeTableName: true
   }
 );
