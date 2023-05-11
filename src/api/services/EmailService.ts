@@ -92,7 +92,7 @@ export default class EmailService implements IEmailService {
       });
       if (!user || !user.activities)
         throw new AuthFailureError('User not found');
-      if (!user.activities.emailVerified)
+      if (user.activities.emailVerified)
         throw new BadRequestError('Email is already verified');
       const token = await this.generateVerificationToken(
         user.id,

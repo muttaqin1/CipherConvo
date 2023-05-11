@@ -94,4 +94,13 @@ export default class UserController implements IAuthController {
       message: 'A verification email has been sended to your email account.'
     });
   }
+
+  @httpPost('/verify-email')
+  public async verifyEmail(@request() req: Request, @response() res: Response) {
+    const { email } = req.body;
+    await this.emailService.sendEmailVerificationEmail(email);
+    new ApiSuccessResponse(res).send({
+      message: 'A verification email has been sended to your email account.'
+    });
+  }
 }
