@@ -305,4 +305,28 @@ export default class AuthService implements IAuthService {
     }
     throw new ForbiddenError();
   }
+
+  public async resetPassword(
+    token: string,
+    newPassword: string
+  ): Promise<void> {
+    const tokenData = await this.twoFactorAuthTokenRepo.findTokenById(token);
+    if (!tokenData) throw new BadRequestError('Invalid Token');
+    const user = await this.userRepo.findUserById(tokenData.userId);
+    if (!user) throw new BadRequestError('Invalid Token');
+    if (tokenData.tokenType !== TokenType.RESET_PASSWORD)
+      throw new ForbiddenError();
+    const hashedPassword = await this.authUtils.generatePassword(
+      newPassword as Password
+    );
+    await this.userRepo.updateUser(user.id, { password: hashedPassword });
+    await this.twoFactorAuthTokenRepo.deleteToken(user.id);
+    await this.authTokenKeysRepo.deleteKeys(user.id);
+  }
+
+  // public changePassword(
+  // user: Required<IUser>,
+  // oldPassword: string,
+  // newPassword: string
+  // ): Promise<void> {}
 }

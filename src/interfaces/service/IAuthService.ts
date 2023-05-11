@@ -21,4 +21,5 @@ export default interface IAuthService {
     accountVerified?: boolean;
     tokenId?: string;
   }>;
+  resetPassword(token: string, newPassword: string): Promise<void>;
 }
