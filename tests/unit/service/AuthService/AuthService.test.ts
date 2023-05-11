@@ -33,6 +33,7 @@ import BaseError from '../../../../src/helpers/AppError/BaseError';
 import { errorStatusCodes } from '../../../../src/helpers/AppError/errorStatusCodes';
 import errorMessages from '../../../../src/helpers/AppError/errorMessages';
 import { loginResponse } from '../../../../src/interfaces/response/authContollerResponse';
+import MockTwoFactorAuthTokenRepository from './MockTwoFactorAuthTokenRepository';
 
 let authService: AuthService;
 
@@ -78,7 +79,8 @@ describe('Class: AuthService', () => {
       new MockAuthUtils() as any,
       new MockAuthTokenKeysRepository() as any,
       new MockActivityRepository() as any,
-      new MockRoleRepository() as any
+      new MockRoleRepository() as any,
+      new MockTwoFactorAuthTokenRepository() as any
     );
   });
   describe('Method: login', () => {
