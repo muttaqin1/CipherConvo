@@ -14,7 +14,8 @@ import {
   httpPost,
   request,
   response,
-  httpPut
+  httpPut,
+  httpGet
 } from 'inversify-express-utils';
 import IAuthController from '@interfaces/controller/IAuthController';
 import { validateSchema as validate } from '@middlewares/validators/validateSchema';
@@ -26,6 +27,7 @@ import {
 import { deserializeUser } from '@auth/deserializeUser';
 import { signupLimiter } from '@middlewares/rateLimit';
 import IEmailService from '@interfaces/service/IEmailService';
+import { BadRequestError } from '@helpers/AppError/ApiError';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -102,5 +104,17 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send({
       message: 'A verification email has been sended to your email account.'
     });
+  }
+
+  @httpGet('/verify-verification-token/:token')
+  public async verifyVerificationToken(
+    @request() req: Request,
+    @response() res: Response
+  ) {
+    const { token } = req.params;
+    const result = await this.authService.verifyVerificationToken(
+      token as string
+    );
+    new ApiSuccessResponse(res).send(result);
   }
 }
