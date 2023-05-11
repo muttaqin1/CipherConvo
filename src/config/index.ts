@@ -33,3 +33,6 @@ export const smtp = {
   password: process.env.SMTP_PASSWORD || null
 };
 export const clientURL = process.env.CLIENT_URL || 'http://localhost:3000';
+export const twoFactorAuthTokenExpiry = new Date(
+  Date.now() + 5 * 60 * 60 * 1000
+);
