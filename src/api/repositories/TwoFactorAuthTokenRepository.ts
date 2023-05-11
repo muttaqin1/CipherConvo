@@ -49,4 +49,12 @@ export default class TwoFactorAuthTokenRepository
       { where: { token } }
     );
   }
+
+  public async findTokenById(
+    id: string
+  ): Promise<twoFactorAuthTokenOutput | null> {
+    return this.TwoFactorAuthTokenModel.findOne({
+      where: { id }
+    });
+  }
 }
