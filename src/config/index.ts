@@ -32,3 +32,4 @@ export const smtp = {
   email: process.env.SMTP_EMAIL || null,
   password: process.env.SMTP_PASSWORD || null
 };
+export const clientURL = process.env.CLIENT_URL || 'http://localhost:3000';
