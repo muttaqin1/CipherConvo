@@ -64,11 +64,8 @@ export const activityData: IActivity = {
   failedLoginAttempts: 0,
   emailVerified: true,
   accessRestricted: false,
-  accessRestrictedUntil: undefined,
   permanentAccessRestricted: false,
   sendedTwoFactorAuthCodeCount: 0,
-  twoFactorAuthRestricted: false,
-  twoFactorAuthRestrictedUntil: undefined,
   createdAt: new Date(),
   updatedAt: new Date()
 };
@@ -774,6 +771,28 @@ describe('Class: AuthService', () => {
       expect(MockCreateUser).toHaveBeenCalledTimes(1);
       expect(MockCreateRole).toHaveBeenCalledTimes(1);
       expect(MockGenerateTokens).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('Method: logout', () => {
+    beforeEach(() => {
+      MockDeleteKeys.mockClear();
+    });
+    it('should call deleteKeys method with correct params.', async () => {
+      await expect(authService.logout(userData)).resolves.toBeUndefined();
+      expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
+      expect(MockDeleteKeys).toHaveBeenCalledWith(userData.id);
+    });
+    it('should throw InternalServerError if deleteKeys method throws.', async () => {
+      MockDeleteKeys.mockImplementation(() => Promise.reject());
+      try {
+        await authService.logout(userData);
+      } catch (err) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect((err as BaseError).message).toBe('logout fail');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.INTERNAL_SERVER_ERROR
+        );
+      }
     });
   });
 });
