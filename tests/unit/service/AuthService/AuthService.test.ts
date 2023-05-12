@@ -1,14 +1,17 @@
 import 'reflect-metadata';
 import AuthService from '../../../../src/api/services/AuthService';
 import MockAuthUtils, {
+  MockDecodeAccessToken,
   MockGeneratePassword,
   MockGenerateTokens,
-  MockValidatePassword
+  MockValidatePassword,
+  MockVerifyRefreshToken
 } from './MockAuthUtils';
 import MockUserRepository, {
   MockCreateUser,
   MockFindByUsername,
-  MockFindUserByEmail
+  MockFindUserByEmail,
+  MockFindUserById
 } from './MockUserRepository';
 import MockAuthTokenKeysRepository, {
   MockCreateKeys,
@@ -34,6 +37,7 @@ import { errorStatusCodes } from '../../../../src/helpers/AppError/errorStatusCo
 import errorMessages from '../../../../src/helpers/AppError/errorMessages';
 import { loginResponse } from '../../../../src/interfaces/response/authContollerResponse';
 import MockTwoFactorAuthTokenRepository from './MockTwoFactorAuthTokenRepository';
+import { Request } from 'express';
 
 let authService: AuthService;
 
@@ -793,6 +797,315 @@ describe('Class: AuthService', () => {
           errorStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
+    });
+  });
+
+  describe('Method: refreshTokens', () => {
+    beforeEach(() => {
+      MockDecodeAccessToken.mockClear();
+      MockFindUserById.mockClear();
+      MockVerifyRefreshToken.mockClear();
+      MockFindKeys.mockClear();
+      MockDeleteKeys.mockClear();
+      MockCreateKeys.mockClear();
+      MockGenerateTokens.mockClear();
+    });
+
+    it('should decode the access token even if it is expired.', async () => {
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch {
+        expect(MockDecodeAccessToken).toHaveBeenCalledTimes(1);
+      }
+    });
+    it('should find the user by using the user id.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id' };
+      });
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch {
+        expect(MockDecodeAccessToken).toHaveBeenCalledTimes(1);
+        expect(MockFindUserById).toHaveBeenCalledTimes(1);
+        expect(MockFindUserById).toHaveBeenCalledWith('id', { role: true });
+      }
+    });
+    it('should throw a ForbiddenError if no user is found.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve(null));
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(MockFindUserById).toHaveBeenCalledTimes(1);
+        expect(MockFindUserById).toHaveBeenCalledWith('id', { role: true });
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect((err as BaseError).message).toBe('User not found');
+        expect((err as BaseError).statusCode).toBe(errorStatusCodes.FORBIDDEN);
+      }
+    });
+    it('should verify the refresh token.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id' })
+      );
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(MockVerifyRefreshToken).toHaveBeenCalledTimes(1);
+        expect(MockVerifyRefreshToken).toHaveBeenCalledWith('refresh-token');
+      }
+    });
+    it('should throw a AuthFailureError if id and sub doesnt mathch.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: '', sub: '' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id', sub: 'sub' })
+      );
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(MockVerifyRefreshToken).toHaveBeenCalledTimes(1);
+        expect(MockVerifyRefreshToken).toHaveBeenCalledWith('refresh-token');
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).message).toBe('Invalid Token');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.UNAUTHORIZED
+        );
+      }
+    });
+    it('should find the auth token keys.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id', sub: 'sub', accessTokenKey: 'key' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
+      );
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch {
+        expect(MockFindKeys).toHaveBeenCalledTimes(1);
+        expect(MockFindKeys).toHaveBeenCalledWith({
+          userId: 'id',
+          refreshTokenKey: 'key',
+          accessTokenKey: 'key'
+        });
+      }
+    });
+    it('should throw a AuthFailureError if no auth token key is found.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id', sub: 'sub', accessTokenKey: 'key' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
+      );
+      MockFindKeys.mockImplementation(() => Promise.resolve(null));
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(MockFindKeys).toHaveBeenCalledTimes(1);
+        expect(MockFindKeys).toHaveBeenCalledWith({
+          userId: 'id',
+          refreshTokenKey: 'key',
+          accessTokenKey: 'key'
+        });
+        expect(err).toBeInstanceOf(AuthFailureError);
+        expect((err as BaseError).message).toBe('Invalid Token');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.UNAUTHORIZED
+        );
+      }
+    });
+    it('should delete the existing auth token keys.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id', sub: 'sub', accessTokenKey: 'key' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
+      );
+      MockFindKeys.mockImplementation(() =>
+        Promise.resolve({
+          data: 'data'
+        })
+      );
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch {
+        expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
+        expect(MockDeleteKeys).toHaveBeenCalledWith('id');
+      }
+    });
+    it('should create new auth token keys.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return Promise.resolve({
+          id: userData.id,
+          sub: 'sub',
+          accessTokenKey: 'key'
+        });
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({ ...userData, roles: roleData })
+      );
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: userData.id, sub: 'sub', refreshTokenKey: 'key' })
+      );
+      MockFindKeys.mockImplementation(() =>
+        Promise.resolve({
+          data: 'data'
+        })
+      );
+      MockDeleteKeys.mockImplementation(() => Promise.resolve());
+      MockCreateKeys.mockImplementation(() => {
+        return Promise.resolve({ keys: 'keys' });
+      });
+      await authService.refreshTokens({
+        body: { refreshToken: 'refresh-token' },
+        get() {
+          return 'Bearer access-token';
+        }
+      } as unknown as Request);
+      expect(MockCreateKeys).toHaveBeenCalledTimes(1);
+      expect(MockCreateKeys).toHaveBeenCalledWith({
+        userId: userData.id,
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
+    });
+    it('should throw InternalServerError if no auth token keys record is returned', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id', sub: 'sub', accessTokenKey: 'key' };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
+      );
+      MockFindKeys.mockImplementation(() =>
+        Promise.resolve({
+          data: 'data'
+        })
+      );
+      MockDeleteKeys.mockImplementation(() => Promise.resolve());
+      MockCreateKeys.mockImplementation(() => Promise.resolve(null));
+      try {
+        await authService.refreshTokens({
+          body: { refreshToken: 'refresh-token' },
+          get() {
+            return 'Bearer access-token';
+          }
+        } as unknown as Request);
+      } catch (err) {
+        expect(MockCreateKeys).toHaveBeenCalledTimes(1);
+        expect(MockCreateKeys).toHaveBeenCalledWith({
+          userId: 'id',
+          accessTokenKey: expect.any(String),
+          refreshTokenKey: expect.any(String)
+        });
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect((err as BaseError).message).toBe(errorMessages.INTERNAL);
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.INTERNAL_SERVER_ERROR
+        );
+      }
+    });
+    it('should issue new access and refresh tokens.', async () => {
+      MockDecodeAccessToken.mockImplementation(() => {
+        return { id: 'id', sub: 'sub', accessTokenKey: 'key' };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({ ...userData, roles: roleData })
+      );
+      MockVerifyRefreshToken.mockImplementation(() =>
+        Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
+      );
+      MockFindKeys.mockImplementation(() =>
+        Promise.resolve({
+          data: 'data'
+        })
+      );
+      MockDeleteKeys.mockImplementation(() => Promise.resolve());
+      MockCreateKeys.mockImplementation(() =>
+        Promise.resolve({ data: 'data' })
+      );
+      MockGenerateTokens.mockImplementation(() => {
+        return Promise.resolve({ accessToken: 'token', refreshToken: 'token' });
+      });
+
+      const tokens = await authService.refreshTokens({
+        body: { refreshToken: 'refresh-token' },
+        get() {
+          return 'Bearer access-token';
+        }
+      } as unknown as Request);
+      expect(tokens).toStrictEqual({
+        accessToken: 'token',
+        refreshToken: 'token'
+      });
+      expect(MockGenerateTokens).toHaveBeenCalledTimes(1);
+      expect(MockGenerateTokens).toHaveBeenCalledWith(
+        { ...userData, roles: roleData },
+        roleData,
+        expect.any(String),
+        expect.any(String)
+      );
+
+      expect(MockCreateKeys).toHaveBeenCalledTimes(1);
+      expect(MockCreateKeys).toHaveBeenCalledWith({
+        userId: userData.id,
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
     });
   });
 });
