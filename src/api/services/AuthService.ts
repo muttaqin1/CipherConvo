@@ -207,11 +207,10 @@ export default class AuthService implements IAuthService {
     }
   }
 
-  public async refreshAccessToken(req: Request): Promise<IToken> {
+  public async refreshTokens(req: Request): Promise<IToken> {
     const { refreshToken } = req.body;
     // decode the access token even if it is expired.
     const accessTokenPayload = await this.authUtils.decodeAccessToken(req);
-    if (!accessTokenPayload) throw new AuthFailureError('Invalid Token');
     // find the user with the id provided in the access token.
     const user = await this.userRepo.findUserById(accessTokenPayload.id, {
       role: true
@@ -221,7 +220,6 @@ export default class AuthService implements IAuthService {
     const refreshTokenPayload = await this.authUtils.verifyRefreshToken(
       refreshToken
     );
-    if (!refreshTokenPayload) throw new AuthFailureError('Invalid Token');
     if (
       accessTokenPayload.id !== refreshTokenPayload.id ||
       accessTokenPayload.sub !== refreshTokenPayload.sub
@@ -230,7 +228,7 @@ export default class AuthService implements IAuthService {
     // check if the keys are already stored in database if stored delete them.
     const authTokenKeys = await this.authTokenKeysRepo.findKeys({
       userId: user.id,
-      accessTokenKey: refreshTokenPayload.accessTokenKey as string,
+      accessTokenKey: accessTokenPayload.accessTokenKey as string,
       refreshTokenKey: refreshTokenPayload.refreshTokenKey as string
     });
     if (!authTokenKeys) throw new AuthFailureError('Invalid Token');
@@ -253,8 +251,6 @@ export default class AuthService implements IAuthService {
       accessTokenKey,
       refreshTokenKey
     );
-    // If tokens are not generated, throw an error.
-    if (!tokens) throw new InternalServerError();
     return tokens;
   }
 
