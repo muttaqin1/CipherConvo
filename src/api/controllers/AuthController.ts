@@ -85,7 +85,7 @@ export default class UserController implements IAuthController {
     @request() req: Request,
     @response() res: Response
   ): Promise<void> {
-    const responseData = await this.authService.refreshAccessToken(req);
+    const responseData = await this.authService.refreshTokens(req);
     new ApiSuccessResponse(res).send(responseData);
   }
 
@@ -134,7 +134,7 @@ export default class UserController implements IAuthController {
     new ApiSuccessResponse(res).send(result);
   }
 
-  @httpPost('/reset-password/:token', validateParams(tokenSchema))
+  @httpPut('/reset-password/:token', validateParams(tokenSchema))
   public async resetPassword(
     @request() req: Request,
     @response() res: Response
@@ -144,6 +144,18 @@ export default class UserController implements IAuthController {
     await this.authService.resetPassword(token as string, password);
     new ApiSuccessResponse(res).send({
       message: 'Password reset successfully.'
+    });
+  }
+
+  @httpPut('/change-password', deserializeUser)
+  public async changePassword(
+    @request() req: Request,
+    @response() res: Response
+  ) {
+    const { oldPassword, newPassword } = req.body;
+    await this.authService.changePassword(req.user, oldPassword, newPassword);
+    new ApiSuccessResponse(res).send({
+      message: 'Password changed successfully.'
     });
   }
 }
