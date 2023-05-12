@@ -27,13 +27,9 @@ export default class Activity
 
   public permanentAccessRestricted!: boolean;
 
+  public passwordChangedLast!: Date;
+
   public accessRestricted!: boolean;
-
-  public accessRestrictedUntil!: Date;
-
-  public twoFactorAuthRestricted!: boolean;
-
-  public twoFactorAuthRestrictedUntil!: Date;
 
   public readonly createdAt!: Date;
 
@@ -69,18 +65,10 @@ Activity.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    accessRestrictedUntil: {
-      type: DataTypes.DATE,
-      defaultValue: null
+    passwordChangedLast: {
+      type: DataTypes.DATE
     },
-    twoFactorAuthRestricted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-    twoFactorAuthRestrictedUntil: {
-      type: DataTypes.DATE,
-      defaultValue: null
-    },
+
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   },
