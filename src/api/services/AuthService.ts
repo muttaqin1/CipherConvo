@@ -199,11 +199,10 @@ export default class AuthService implements IAuthService {
     };
   }
 
-  public async logout(user: UserIncludedRolesAndActivities): Promise<boolean> {
+  public async logout(user: UserIncludedRolesAndActivities): Promise<void> {
     try {
       await this.authTokenKeysRepo.deleteKeys(user.id);
-      return true;
-    } catch (e) {
+    } catch {
       throw new InternalServerError('logout fail');
     }
   }

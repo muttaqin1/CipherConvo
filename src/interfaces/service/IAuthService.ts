@@ -14,7 +14,7 @@ export default interface IAuthService {
     password: string;
   }): Promise<loginResponse>;
   signup(userData: userInput): Promise<singupResponse>;
-  logout(user: UserIncludedRolesAndActivities): Promise<boolean>;
+  logout(user: UserIncludedRolesAndActivities): Promise<void>;
   refreshAccessToken(req: Request): Promise<IToken>;
   verifyVerificationToken(token: string): Promise<{
     emailVerified?: boolean;
