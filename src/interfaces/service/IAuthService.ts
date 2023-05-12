@@ -22,4 +22,9 @@ export default interface IAuthService {
     tokenId?: string;
   }>;
   resetPassword(token: string, newPassword: string): Promise<void>;
+  changePassword(
+    user: UserIncludedRolesAndActivities,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<void>;
 }

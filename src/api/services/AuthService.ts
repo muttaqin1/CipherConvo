@@ -319,9 +319,17 @@ export default class AuthService implements IAuthService {
     await this.authTokenKeysRepo.deleteKeys(user.id);
   }
 
-  // public changePassword(
-  // user: Required<IUser>,
-  // oldPassword: string,
-  // newPassword: string
-  // ): Promise<void> {}
+  public async changePassword(
+    user: UserIncludedRolesAndActivities,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    if (!user.password || !user.activities) throw new ForbiddenError();
+    const bool = this.authUtils.validatePassword(oldPassword, user.password);
+    if (!bool) throw new BadRequestError('Invalid Password');
+    const genNewPass = await this.authUtils.generatePassword(newPassword);
+    await this.userRepo.updateUser(user.id, {
+      password: genNewPass
+    });
+  }
 }
