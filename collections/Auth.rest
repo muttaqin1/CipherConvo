@@ -26,7 +26,7 @@ POST /api/v1/auth/signup
 POST /api/v1/auth/login
 {
 "email":"example@gmail.com",
-"password":"SecuredPass@1234"
+"password":"SecuredPass@123"
 }
 --
 # logout
@@ -37,6 +37,32 @@ DELETE /api/v1/auth/logout
 # get a new access token with the help of refresh token
 PUT /api/v1/auth/token-refresh
 {
-  refreshToken:'Your refresh token'
+  "refreshToken":"Your refresh token"
+}
+--
+# verify account
+POST /api/v1/auth/verify-account
+{
+  "email":"example@gmail.com"
+
+}
+--
+# verify email
+POST /api/v1/auth/verify-email
+{
+  "email":"example@gmail.com"
+}
+
+--
+# forgot password
+POST /api/v1/auth/forgot-password
+{
+  "email":"example@gmail.com"
+}
+--
+# reset password
+POST /api/v1/auth/reset-password/9277ac00-f59b-4aa5-b79b-a67249ae7b8a
+{
+  "password":"SecuredPass@123"
 }
 --
