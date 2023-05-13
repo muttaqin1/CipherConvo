@@ -1,4 +1,3 @@
-import nodemailer, { Transporter } from 'nodemailer';
 import {
   AuthFailureError,
   BadRequestError,
@@ -13,18 +12,20 @@ import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuth
 import TYPES from '@ioc/TYPES';
 import IUserRepository from '@interfaces/repository/IUserRepository';
 import { TokenType, TTokenType } from '@interfaces/models/ITwoFactorAuthToken';
+import NodeMailer from 'nodemailer';
 
 @injectable()
 export default class EmailService implements IEmailService {
-  private transporter: Transporter;
-
   constructor(
     @inject(TYPES.TwoFactorAuthTokenRepository)
     private readonly twoFactorAuthTokenRepository: ITwoFactorAuthTokenRepository,
     @inject(TYPES.UserRepository)
-    private readonly userRepository: IUserRepository
-  ) {
-    this.transporter = nodemailer.createTransport({
+    private readonly userRepository: IUserRepository,
+    @inject(TYPES.NodeMailer) private readonly nodemailer: typeof NodeMailer
+  ) {}
+
+  private gmailTransporter() {
+    return this.nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: smtp.email ? smtp.email : '',
@@ -42,7 +43,7 @@ export default class EmailService implements IEmailService {
       subject,
       text
     };
-    this.transporter.sendMail(mailOptions, (error) => {
+    this.gmailTransporter().sendMail(mailOptions, (error) => {
       if (error) throw new InternalServerError();
     });
   }
