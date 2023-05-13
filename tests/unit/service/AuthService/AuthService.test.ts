@@ -11,7 +11,8 @@ import MockUserRepository, {
   MockCreateUser,
   MockFindByUsername,
   MockFindUserByEmail,
-  MockFindUserById
+  MockFindUserById,
+  MockUpdateUser
 } from './MockUserRepository';
 import MockAuthTokenKeysRepository, {
   MockCreateKeys,
@@ -38,6 +39,7 @@ import errorMessages from '../../../../src/helpers/AppError/errorMessages';
 import { loginResponse } from '../../../../src/interfaces/response/authContollerResponse';
 import MockTwoFactorAuthTokenRepository, {
   MockDeleteToken,
+  MockFindTokenById,
   MockFindTokenByToken,
   MockVerifyToken
 } from './MockTwoFactorAuthTokenRepository';
@@ -1271,6 +1273,92 @@ describe('Class: AuthService', () => {
       await expect(authService.verifyVerificationToken('')).rejects.toThrow(
         ForbiddenError
       );
+    });
+  });
+  describe('Method: resetPassword', () => {
+    beforeEach(() => {
+      MockFindTokenById.mockClear();
+      MockFindUserById.mockClear();
+      MockGeneratePassword.mockClear();
+      MockUpdateUser.mockClear();
+      MockDeleteToken.mockClear();
+      MockDeleteKeys.mockClear();
+    });
+    it('should throw a BadRequestError if no token found.', async () => {
+      MockFindTokenById.mockImplementation(() => Promise.resolve(null));
+      try {
+        await authService.resetPassword('token', 'password');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Invalid Token');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockFindTokenById).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenById).toHaveBeenCalledWith('token');
+    });
+    it('should throw BadRequestError if no user is accociated with the token.', async () => {
+      MockFindTokenById.mockImplementation(() =>
+        Promise.resolve({ token: 'token', userId: '111' })
+      );
+      MockFindUserById.mockImplementation(() => Promise.resolve(null));
+      try {
+        await authService.resetPassword('token', 'password');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Invalid Token');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('111', undefined);
+    });
+    it('should throw a ForbiddenError if tokenType is not reset password.', async () => {
+      MockFindTokenById.mockImplementation(() =>
+        Promise.resolve({
+          token: 'token',
+          userId: '111',
+          tokenType: 'VERIFY_EMAIL'
+        })
+      );
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({ ...userData })
+      );
+      try {
+        await authService.resetPassword('token', 'password');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect((err as BaseError).message).toBe(errorMessages.FORBIDDEN);
+        expect((err as BaseError).statusCode).toBe(errorStatusCodes.FORBIDDEN);
+      }
+      expect(MockFindTokenById).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenById).toHaveBeenCalledWith('token');
+    });
+    it('should reset the password.', async () => {
+      MockFindTokenById.mockImplementation(() =>
+        Promise.resolve({
+          token: 'token',
+          userId: '111',
+          tokenType: 'RESET_PASSWORD'
+        })
+      );
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({ ...userData })
+      );
+      MockGeneratePassword.mockImplementation(() => Promise.resolve());
+      MockUpdateUser.mockImplementation(() => Promise.resolve());
+      MockDeleteKeys.mockImplementation(() => Promise.resolve());
+      MockDeleteToken.mockImplementation(() => Promise.resolve());
+      await authService.resetPassword('token', 'password');
+      expect(MockFindTokenById).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenById).toHaveBeenCalledWith('token');
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockGeneratePassword).toHaveBeenCalledTimes(1);
+      expect(MockUpdateUser).toHaveBeenCalledTimes(1);
+      expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
+      expect(MockDeleteToken).toHaveBeenCalledTimes(1);
     });
   });
 });
