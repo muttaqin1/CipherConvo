@@ -36,7 +36,11 @@ import BaseError from '../../../../src/helpers/AppError/BaseError';
 import { errorStatusCodes } from '../../../../src/helpers/AppError/errorStatusCodes';
 import errorMessages from '../../../../src/helpers/AppError/errorMessages';
 import { loginResponse } from '../../../../src/interfaces/response/authContollerResponse';
-import MockTwoFactorAuthTokenRepository from './MockTwoFactorAuthTokenRepository';
+import MockTwoFactorAuthTokenRepository, {
+  MockDeleteToken,
+  MockFindTokenByToken,
+  MockVerifyToken
+} from './MockTwoFactorAuthTokenRepository';
 import { Request } from 'express';
 
 let authService: AuthService;
@@ -124,12 +128,12 @@ describe('Class: AuthService', () => {
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.FORBIDDEN
         );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
-          role: true,
-          activity: true
-        });
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
+        role: true,
+        activity: true
+      });
     });
     it('should throw a ForbiddenError if password is missing from user object.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -146,12 +150,12 @@ describe('Class: AuthService', () => {
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.FORBIDDEN
         );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
-          role: true,
-          activity: true
-        });
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
+        role: true,
+        activity: true
+      });
     });
     it('should throw a ForbiddenError if role is missing from user object.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(userData));
@@ -166,12 +170,12 @@ describe('Class: AuthService', () => {
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.FORBIDDEN
         );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
-          role: true,
-          activity: true
-        });
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
+        role: true,
+        activity: true
+      });
     });
     it('should throw a ForbiddenError if user access is permanently restricted.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -194,12 +198,12 @@ describe('Class: AuthService', () => {
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.FORBIDDEN
         );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
-          role: true,
-          activity: true
-        });
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
+        role: true,
+        activity: true
+      });
     });
     it('should throw a ForbiddenError if user access is restricted.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -222,12 +226,12 @@ describe('Class: AuthService', () => {
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.FORBIDDEN
         );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
-          role: true,
-          activity: true
-        });
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
+        role: true,
+        activity: true
+      });
     });
     it('should throw a ForbiddenError if user activity does not exist.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -247,12 +251,12 @@ describe('Class: AuthService', () => {
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.FORBIDDEN
         );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
-          role: true,
-          activity: true
-        });
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith('test@gmail.com', {
+        role: true,
+        activity: true
+      });
     });
     it('should increment failed login attempts before throwing a AuthFailureError.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -269,22 +273,21 @@ describe('Class: AuthService', () => {
           password: 'test'
         });
       } catch (error) {
-        expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
-        expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
-          failedLoginAttempts: 1
-        });
-
         expect(error).toBeInstanceOf(AuthFailureError);
         expect((error as BaseError).message).toBe('Invalid Password');
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.UNAUTHORIZED
         );
-        expect(MockValidatePassword).toHaveBeenCalledTimes(1);
-        expect(MockValidatePassword).toHaveBeenCalledWith(
-          'test',
-          userData.password
-        );
       }
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
+        failedLoginAttempts: 1
+      });
+      expect(MockValidatePassword).toHaveBeenCalledTimes(1);
+      expect(MockValidatePassword).toHaveBeenCalledWith(
+        'test',
+        userData.password
+      );
     });
     it('should restrict account access if failed login attempts is greater than 8 and throw AuthFailureError.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -301,24 +304,24 @@ describe('Class: AuthService', () => {
           password: 'test'
         });
       } catch (error) {
-        expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
-        expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
-          accessRestricted: true,
-          failedLoginAttempts: 0
-        });
-        expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
-        expect(MockDeleteKeys).toHaveBeenCalledWith(userData.id);
         expect(error).toBeInstanceOf(AuthFailureError);
         expect((error as BaseError).message).toBe('Invalid Password');
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.UNAUTHORIZED
         );
-        expect(MockValidatePassword).toHaveBeenCalledTimes(1);
-        expect(MockValidatePassword).toHaveBeenCalledWith(
-          'test',
-          userData.password
-        );
       }
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
+        accessRestricted: true,
+        failedLoginAttempts: 0
+      });
+      expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
+      expect(MockDeleteKeys).toHaveBeenCalledWith(userData.id);
+      expect(MockValidatePassword).toHaveBeenCalledTimes(1);
+      expect(MockValidatePassword).toHaveBeenCalledWith(
+        'test',
+        userData.password
+      );
     });
     it('should clear failedLoginAttempts on successful login.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -329,22 +332,21 @@ describe('Class: AuthService', () => {
         })
       );
       MockValidatePassword.mockImplementation(() => Promise.resolve(true));
-      try {
-        await authService.login({
+      await expect(
+        authService.login({
           email: 'test@gmail.com',
           password: 'test'
-        });
-      } catch (error) {
-        expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
-        expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
-          failedLoginAttempts: 0
-        });
-        expect(MockValidatePassword).toHaveBeenCalledTimes(1);
-        expect(MockValidatePassword).toHaveBeenCalledWith(
-          'test',
-          userData.password
-        );
-      }
+        })
+      ).rejects.toThrowError();
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
+        failedLoginAttempts: 0
+      });
+      expect(MockValidatePassword).toHaveBeenCalledTimes(1);
+      expect(MockValidatePassword).toHaveBeenCalledWith(
+        'test',
+        userData.password
+      );
     });
     it('should delete authTokenKeys if exists', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -356,21 +358,20 @@ describe('Class: AuthService', () => {
       );
       MockValidatePassword.mockImplementation(() => Promise.resolve(true));
       MockFindKeys.mockImplementation(() => Promise.resolve({ data: 'data' }));
-      try {
-        await authService.login({
+      await expect(
+        authService.login({
           email: 'test@gmail.com',
           password: 'test'
-        });
-      } catch (error) {
-        expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
-        expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
-          failedLoginAttempts: 0
-        });
-        expect(MockFindKeys).toHaveBeenCalledTimes(1);
-        expect(MockFindKeys).toHaveBeenCalledWith({ userId: userData.id });
-        expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
-        expect(MockDeleteKeys).toHaveBeenCalledWith(userData.id);
-      }
+        })
+      ).rejects.toThrowError();
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledWith(userData.id, {
+        failedLoginAttempts: 0
+      });
+      expect(MockFindKeys).toHaveBeenCalledTimes(1);
+      expect(MockFindKeys).toHaveBeenCalledWith({ userId: userData.id });
+      expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
+      expect(MockDeleteKeys).toHaveBeenCalledWith(userData.id);
     });
     it('should create authTokenKeys.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -383,19 +384,18 @@ describe('Class: AuthService', () => {
       MockValidatePassword.mockImplementation(() => Promise.resolve(true));
       MockFindKeys.mockImplementation(() => Promise.resolve(null));
 
-      try {
-        await authService.login({
+      await expect(
+        authService.login({
           email: 'test@gmail.com',
           password: 'test'
-        });
-      } catch (error) {
-        expect(MockCreateKeys).toHaveBeenCalledTimes(1);
-        expect(MockCreateKeys).toHaveBeenCalledWith({
-          userId: userData.id,
-          accessTokenKey: expect.any(String),
-          refreshTokenKey: expect.any(String)
-        });
-      }
+        })
+      ).rejects.toThrowError();
+      expect(MockCreateKeys).toHaveBeenCalledTimes(1);
+      expect(MockCreateKeys).toHaveBeenCalledWith({
+        userId: userData.id,
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
     });
     it('should throw a InternalServerError if no keys are created.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -414,18 +414,18 @@ describe('Class: AuthService', () => {
           password: 'test'
         });
       } catch (error) {
-        expect(MockCreateKeys).toHaveBeenCalledTimes(1);
-        expect(MockCreateKeys).toHaveBeenCalledWith({
-          userId: userData.id,
-          accessTokenKey: expect.any(String),
-          refreshTokenKey: expect.any(String)
-        });
         expect(error).toBeInstanceOf(InternalServerError);
         expect((error as BaseError).message).toBe(errorMessages.INTERNAL);
         expect((error as BaseError).statusCode).toBe(
           errorStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
+      expect(MockCreateKeys).toHaveBeenCalledTimes(1);
+      expect(MockCreateKeys).toHaveBeenCalledWith({
+        userId: userData.id,
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
     });
     it('should generate access and refresh tokens.', async () => {
       MockFindUserByEmail.mockImplementation(() =>
@@ -531,17 +531,17 @@ describe('Class: AuthService', () => {
       try {
         await authService.signup(userData);
       } catch (e) {
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindUserByEmail).toHaveBeenCalledWith(
-          userData.email,
-          undefined
-        );
         expect(e).toBeInstanceOf(BadRequestError);
         expect((e as BaseError).message).toBe(
           'User already exists with this email'
         );
         expect((e as BaseError).statusCode).toBe(errorStatusCodes.BAD_REQUEST);
       }
+      expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
+      expect(MockFindUserByEmail).toHaveBeenCalledWith(
+        userData.email,
+        undefined
+      );
     });
     it('should throw a BadRequestError if user already exists with the provided userName.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -549,38 +549,15 @@ describe('Class: AuthService', () => {
       try {
         await authService.signup(userData);
       } catch (e) {
-        expect(MockFindByUsername).toHaveBeenCalledTimes(1);
-        expect(MockFindByUsername).toHaveBeenCalledWith(
-          userData.userName,
-          undefined
-        );
         expect(e).toBeInstanceOf(BadRequestError);
         expect((e as BaseError).message).toBe('Username already exists');
         expect((e as BaseError).statusCode).toBe(errorStatusCodes.BAD_REQUEST);
       }
-    });
-    it('should generate a hashed password.', async () => {
-      MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
-      MockFindByUsername.mockImplementation(() => Promise.resolve(null));
-      MockGeneratePassword.mockImplementation(() =>
-        Promise.resolve('hashedPassword')
+      expect(MockFindByUsername).toHaveBeenCalledTimes(1);
+      expect(MockFindByUsername).toHaveBeenCalledWith(
+        userData.userName,
+        undefined
       );
-      try {
-        await authService.signup(userData);
-      } catch {
-        expect(MockGeneratePassword).toHaveBeenCalledTimes(1);
-        expect(MockGeneratePassword).toHaveBeenCalledWith(
-          userData.password,
-          undefined
-        );
-        expect(MockFindUserByEmail).toHaveBeenCalledTimes(1);
-        expect(MockFindByUsername).toHaveBeenCalledTimes(1);
-
-        expect(MockFindByUsername).toHaveBeenCalledWith(
-          userData.userName,
-          undefined
-        );
-      }
     });
     it('should create a user.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -589,15 +566,12 @@ describe('Class: AuthService', () => {
         Promise.resolve('hashedPassword')
       );
       MockCreateUser.mockImplementation(() => Promise.resolve(true));
-      try {
-        await authService.signup(userData);
-      } catch {
-        expect(MockCreateUser).toBeCalledTimes(1);
-        expect(MockCreateUser).toBeCalledWith({
-          ...userData,
-          password: 'hashedPassword'
-        });
-      }
+      await expect(authService.signup(userData)).rejects.toThrowError();
+      expect(MockCreateUser).toBeCalledTimes(1);
+      expect(MockCreateUser).toBeCalledWith({
+        ...userData,
+        password: 'hashedPassword'
+      });
     });
     it('should throw a InternalServerError if userData is falsy.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -609,17 +583,17 @@ describe('Class: AuthService', () => {
       try {
         await authService.signup(userData);
       } catch (err) {
-        expect(MockCreateUser).toBeCalledTimes(1);
-        expect(MockCreateUser).toBeCalledWith({
-          ...userData,
-          password: 'hashedPassword'
-        });
         expect(err).toBeInstanceOf(InternalServerError);
         expect((err as BaseError).message).toBe('Failed to create user');
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
+      expect(MockCreateUser).toBeCalledTimes(1);
+      expect(MockCreateUser).toBeCalledWith({
+        ...userData,
+        password: 'hashedPassword'
+      });
     });
     it('should create a activity.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -628,16 +602,11 @@ describe('Class: AuthService', () => {
         Promise.resolve('hashedPassword')
       );
       MockCreateUser.mockImplementation(() => Promise.resolve(userData));
-
-      try {
-        await authService.signup(userData);
-      } catch (err) {
-        console.log(err);
-        expect(MockCreateActivity).toBeCalledTimes(1);
-        expect(MockCreateActivity).toBeCalledWith({
-          userId: userData.id
-        });
-      }
+      await authService.signup(userData);
+      expect(MockCreateActivity).toBeCalledTimes(1);
+      expect(MockCreateActivity).toBeCalledWith({
+        userId: userData.id
+      });
     });
     it('should create role.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -646,16 +615,13 @@ describe('Class: AuthService', () => {
         Promise.resolve('hashedPassword')
       );
       MockCreateUser.mockImplementation(() => Promise.resolve(userData));
-      try {
-        await authService.signup(userData);
-      } catch {
-        expect(MockCreateRole).toBeCalledTimes(1);
-        expect(MockCreateRole).toBeCalledWith({
-          userId: userData.id,
-          admin: false,
-          user: true
-        });
-      }
+      await authService.signup(userData);
+      expect(MockCreateRole).toBeCalledTimes(1);
+      expect(MockCreateRole).toBeCalledWith({
+        userId: userData.id,
+        admin: false,
+        user: true
+      });
     });
     it('should create auth token keys keys', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -664,16 +630,13 @@ describe('Class: AuthService', () => {
         Promise.resolve('hashedPassword')
       );
       MockCreateUser.mockImplementation(() => Promise.resolve(userData));
-      try {
-        await authService.signup(userData);
-      } catch (err) {
-        expect(MockCreateKeys).toBeCalledTimes(1);
-        expect(MockCreateKeys).toBeCalledWith({
-          userId: userData.id,
-          accessTokenKey: expect.any(String),
-          refreshTokenKey: expect.any(String)
-        });
-      }
+      await authService.signup(userData);
+      expect(MockCreateKeys).toBeCalledTimes(1);
+      expect(MockCreateKeys).toBeCalledWith({
+        userId: userData.id,
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
     });
     it('should throw InternalServerError if no record is returned from authTokenKeysRepo.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -686,18 +649,18 @@ describe('Class: AuthService', () => {
       try {
         await authService.signup(userData);
       } catch (err) {
-        expect(MockCreateKeys).toBeCalledTimes(1);
-        expect(MockCreateKeys).toBeCalledWith({
-          userId: userData.id,
-          accessTokenKey: expect.any(String),
-          refreshTokenKey: expect.any(String)
-        });
         expect(err).toBeInstanceOf(InternalServerError);
         expect((err as BaseError).message).toBe(errorMessages.INTERNAL);
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
+      expect(MockCreateKeys).toBeCalledTimes(1);
+      expect(MockCreateKeys).toBeCalledWith({
+        userId: userData.id,
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
     });
     it('should generate access and refresh token.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -708,17 +671,14 @@ describe('Class: AuthService', () => {
       MockCreateUser.mockImplementation(() => Promise.resolve(userData));
       MockCreateRole.mockImplementation(() => Promise.resolve(roleData));
       MockCreateKeys.mockReturnValue(Promise.resolve({ keys: 'keys' }));
-      try {
-        await authService.signup(userData);
-      } catch {
-        expect(MockGenerateTokens).toHaveBeenCalledTimes(1);
-        expect(MockGenerateTokens).toHaveBeenCalledWith(
-          userData,
-          roleData,
-          expect.any(String),
-          expect.any(String)
-        );
-      }
+      await authService.signup(userData);
+      expect(MockGenerateTokens).toHaveBeenCalledTimes(1);
+      expect(MockGenerateTokens).toHaveBeenCalledWith(
+        userData,
+        roleData,
+        expect.any(String),
+        expect.any(String)
+      );
     });
     it('should throw a InternalServerError if no token is returned from generateToken method.', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -733,19 +693,19 @@ describe('Class: AuthService', () => {
       try {
         await authService.signup(userData);
       } catch (err) {
-        expect(MockGenerateTokens).toHaveBeenCalledTimes(1);
-        expect(MockGenerateTokens).toHaveBeenCalledWith(
-          userData,
-          roleData,
-          expect.any(String),
-          expect.any(String)
-        );
         expect(err).toBeInstanceOf(InternalServerError);
         expect((err as BaseError).message).toBe(errorMessages.INTERNAL);
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
+      expect(MockGenerateTokens).toHaveBeenCalledTimes(1);
+      expect(MockGenerateTokens).toHaveBeenCalledWith(
+        userData,
+        roleData,
+        expect.any(String),
+        expect.any(String)
+      );
     });
     it('should return valid signup response', async () => {
       MockFindUserByEmail.mockImplementation(() => Promise.resolve(null));
@@ -812,35 +772,33 @@ describe('Class: AuthService', () => {
     });
 
     it('should decode the access token even if it is expired.', async () => {
-      try {
-        await authService.refreshTokens({
+      await expect(
+        authService.refreshTokens({
           body: { refreshToken: 'refresh-token' },
 
           get() {
             return 'Bearer access-token';
           }
-        } as unknown as Request);
-      } catch {
-        expect(MockDecodeAccessToken).toHaveBeenCalledTimes(1);
-      }
+        } as unknown as Request)
+      ).rejects.toThrowError();
+      expect(MockDecodeAccessToken).toHaveBeenCalledTimes(1);
     });
     it('should find the user by using the user id.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
         return { id: 'id' };
       });
-      try {
-        await authService.refreshTokens({
+      await expect(
+        authService.refreshTokens({
           body: { refreshToken: 'refresh-token' },
 
           get() {
             return 'Bearer access-token';
           }
-        } as unknown as Request);
-      } catch {
-        expect(MockDecodeAccessToken).toHaveBeenCalledTimes(1);
-        expect(MockFindUserById).toHaveBeenCalledTimes(1);
-        expect(MockFindUserById).toHaveBeenCalledWith('id', { role: true });
-      }
+        } as unknown as Request)
+      ).rejects.toThrowError();
+      expect(MockDecodeAccessToken).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('id', { role: true });
     });
     it('should throw a ForbiddenError if no user is found.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -856,12 +814,12 @@ describe('Class: AuthService', () => {
           }
         } as unknown as Request);
       } catch (err) {
-        expect(MockFindUserById).toHaveBeenCalledTimes(1);
-        expect(MockFindUserById).toHaveBeenCalledWith('id', { role: true });
         expect(err).toBeInstanceOf(ForbiddenError);
         expect((err as BaseError).message).toBe('User not found');
         expect((err as BaseError).statusCode).toBe(errorStatusCodes.FORBIDDEN);
       }
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('id', { role: true });
     });
     it('should verify the refresh token.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -871,17 +829,16 @@ describe('Class: AuthService', () => {
       MockVerifyRefreshToken.mockImplementation(() =>
         Promise.resolve({ id: 'id' })
       );
-      try {
-        await authService.refreshTokens({
+      await expect(
+        authService.refreshTokens({
           body: { refreshToken: 'refresh-token' },
           get() {
             return 'Bearer access-token';
           }
-        } as unknown as Request);
-      } catch (err) {
-        expect(MockVerifyRefreshToken).toHaveBeenCalledTimes(1);
-        expect(MockVerifyRefreshToken).toHaveBeenCalledWith('refresh-token');
-      }
+        } as unknown as Request)
+      ).rejects.toThrowError();
+      expect(MockVerifyRefreshToken).toHaveBeenCalledTimes(1);
+      expect(MockVerifyRefreshToken).toHaveBeenCalledWith('refresh-token');
     });
     it('should throw a AuthFailureError if id and sub doesnt mathch.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -899,14 +856,14 @@ describe('Class: AuthService', () => {
           }
         } as unknown as Request);
       } catch (err) {
-        expect(MockVerifyRefreshToken).toHaveBeenCalledTimes(1);
-        expect(MockVerifyRefreshToken).toHaveBeenCalledWith('refresh-token');
         expect(err).toBeInstanceOf(AuthFailureError);
         expect((err as BaseError).message).toBe('Invalid Token');
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.UNAUTHORIZED
         );
       }
+      expect(MockVerifyRefreshToken).toHaveBeenCalledTimes(1);
+      expect(MockVerifyRefreshToken).toHaveBeenCalledWith('refresh-token');
     });
     it('should find the auth token keys.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -916,21 +873,20 @@ describe('Class: AuthService', () => {
       MockVerifyRefreshToken.mockImplementation(() =>
         Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
       );
-      try {
-        await authService.refreshTokens({
+      await expect(
+        authService.refreshTokens({
           body: { refreshToken: 'refresh-token' },
           get() {
             return 'Bearer access-token';
           }
-        } as unknown as Request);
-      } catch {
-        expect(MockFindKeys).toHaveBeenCalledTimes(1);
-        expect(MockFindKeys).toHaveBeenCalledWith({
-          userId: 'id',
-          refreshTokenKey: 'key',
-          accessTokenKey: 'key'
-        });
-      }
+        } as unknown as Request)
+      ).rejects.toThrowError();
+      expect(MockFindKeys).toHaveBeenCalledTimes(1);
+      expect(MockFindKeys).toHaveBeenCalledWith({
+        userId: 'id',
+        refreshTokenKey: 'key',
+        accessTokenKey: 'key'
+      });
     });
     it('should throw a AuthFailureError if no auth token key is found.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -949,24 +905,26 @@ describe('Class: AuthService', () => {
           }
         } as unknown as Request);
       } catch (err) {
-        expect(MockFindKeys).toHaveBeenCalledTimes(1);
-        expect(MockFindKeys).toHaveBeenCalledWith({
-          userId: 'id',
-          refreshTokenKey: 'key',
-          accessTokenKey: 'key'
-        });
         expect(err).toBeInstanceOf(AuthFailureError);
         expect((err as BaseError).message).toBe('Invalid Token');
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.UNAUTHORIZED
         );
       }
+      expect(MockFindKeys).toHaveBeenCalledTimes(1);
+      expect(MockFindKeys).toHaveBeenCalledWith({
+        userId: 'id',
+        refreshTokenKey: 'key',
+        accessTokenKey: 'key'
+      });
     });
     it('should delete the existing auth token keys.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
-        return { id: 'id', sub: 'sub', accessTokenKey: 'key' };
+        return Promise.resolve({ id: 'id', sub: 'sub', accessTokenKey: 'key' });
       });
-      MockFindUserById.mockImplementation(() => Promise.resolve({ id: 'id' }));
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({ ...userData, roles: roleData })
+      );
       MockVerifyRefreshToken.mockImplementation(() =>
         Promise.resolve({ id: 'id', sub: 'sub', refreshTokenKey: 'key' })
       );
@@ -975,17 +933,19 @@ describe('Class: AuthService', () => {
           data: 'data'
         })
       );
-      try {
-        await authService.refreshTokens({
-          body: { refreshToken: 'refresh-token' },
-          get() {
-            return 'Bearer access-token';
-          }
-        } as unknown as Request);
-      } catch {
-        expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
-        expect(MockDeleteKeys).toHaveBeenCalledWith('id');
-      }
+      MockDeleteKeys.mockImplementation(() => Promise.resolve());
+      MockCreateKeys.mockImplementation(() => Promise.resolve({ key: 'key' }));
+      MockGenerateTokens.mockImplementation(() =>
+        Promise.resolve({ key: 'key' })
+      );
+      await authService.refreshTokens({
+        body: { refreshToken: 'refresh-token' },
+        get() {
+          return 'Bearer access-token';
+        }
+      } as unknown as Request);
+      expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
+      expect(MockDeleteKeys).toHaveBeenCalledWith('111');
     });
     it('should create new auth token keys.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -1046,18 +1006,18 @@ describe('Class: AuthService', () => {
           }
         } as unknown as Request);
       } catch (err) {
-        expect(MockCreateKeys).toHaveBeenCalledTimes(1);
-        expect(MockCreateKeys).toHaveBeenCalledWith({
-          userId: 'id',
-          accessTokenKey: expect.any(String),
-          refreshTokenKey: expect.any(String)
-        });
         expect(err).toBeInstanceOf(InternalServerError);
         expect((err as BaseError).message).toBe(errorMessages.INTERNAL);
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.INTERNAL_SERVER_ERROR
         );
       }
+      expect(MockCreateKeys).toHaveBeenCalledTimes(1);
+      expect(MockCreateKeys).toHaveBeenCalledWith({
+        userId: 'id',
+        accessTokenKey: expect.any(String),
+        refreshTokenKey: expect.any(String)
+      });
     });
     it('should issue new access and refresh tokens.', async () => {
       MockDecodeAccessToken.mockImplementation(() => {
@@ -1106,6 +1066,211 @@ describe('Class: AuthService', () => {
         accessTokenKey: expect.any(String),
         refreshTokenKey: expect.any(String)
       });
+    });
+  });
+  describe('Method: verifyVerificationToken', () => {
+    beforeEach(() => {
+      MockFindTokenByToken.mockClear();
+      MockFindUserById.mockClear();
+      MockUpdateActivity.mockClear();
+      MockDeleteToken.mockClear();
+      MockVerifyToken.mockClear();
+    });
+    it('should throw a BadRequestError if no token is found.', async () => {
+      try {
+        await authService.verifyVerificationToken('');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Invalid Token');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockFindTokenByToken).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenByToken).toHaveBeenCalledWith('');
+    });
+    it('should throw a BadRequestError if no user is found from the token.', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          userId: '111'
+        };
+      });
+      MockFindUserById.mockImplementation(() => Promise.resolve(null));
+      try {
+        await authService.verifyVerificationToken('');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Invalid Token');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('111', { activity: true });
+      expect(MockFindTokenByToken).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenByToken).toHaveBeenCalledWith('');
+    });
+    it('should throw a ForbiddenError if activity obj doesnt exists.', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          userId: '111'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: null
+        })
+      );
+      try {
+        await authService.verifyVerificationToken('');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect((err as BaseError).message).toBe(errorMessages.FORBIDDEN);
+        expect((err as BaseError).statusCode).toBe(errorStatusCodes.FORBIDDEN);
+      }
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('111', { activity: true });
+      expect(MockFindTokenByToken).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenByToken).toHaveBeenCalledWith('');
+    });
+    it('should throw a BadRequestError if account already verified', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          userId: '111',
+          tokenType: 'VERIFY_ACCOUNT'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: { accessRestricted: false }
+        })
+      );
+      try {
+        await authService.verifyVerificationToken('');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Account already verified');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('111', { activity: true });
+      expect(MockFindTokenByToken).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenByToken).toHaveBeenCalledWith('');
+    });
+    it('should throw a BadRequestError if email already verified.', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          userId: '111',
+          tokenType: 'VERIFY_EMAIL'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: { emailVerified: true }
+        })
+      );
+      try {
+        await authService.verifyVerificationToken('');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Email already verified');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockFindUserById).toHaveBeenCalledTimes(1);
+      expect(MockFindUserById).toHaveBeenCalledWith('111', { activity: true });
+      expect(MockFindTokenByToken).toHaveBeenCalledTimes(1);
+      expect(MockFindTokenByToken).toHaveBeenCalledWith('');
+    });
+    it('should verify the email.', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          userId: '111',
+          tokenType: 'VERIFY_EMAIL'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: { ...activityData, emailVerified: false }
+        })
+      );
+      expect(await authService.verifyVerificationToken('')).toStrictEqual({
+        emailVerified: true
+      });
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledWith('111', {
+        emailVerified: true
+      });
+      expect(MockDeleteToken).toHaveBeenCalledTimes(1);
+      expect(MockDeleteToken).toHaveBeenCalledWith('111');
+    });
+    it('should verify the account.', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          userId: '111',
+          tokenType: 'VERIFY_ACCOUNT'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: { ...activityData, accessRestricted: true }
+        })
+      );
+      expect(await authService.verifyVerificationToken('')).toStrictEqual({
+        accountVerified: true
+      });
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledWith('111', {
+        accessRestricted: false
+      });
+      expect(MockDeleteToken).toHaveBeenCalledTimes(1);
+      expect(MockDeleteToken).toHaveBeenCalledWith('111');
+    });
+    it('should verify the two factor auth token.', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          id: '222',
+          userId: '111',
+          tokenType: 'RESET_PASSWORD'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: activityData
+        })
+      );
+      expect(await authService.verifyVerificationToken('')).toStrictEqual({
+        tokenId: '222'
+      });
+      expect(MockVerifyToken).toHaveBeenCalledTimes(1);
+      expect(MockVerifyToken).toHaveBeenCalledWith('');
+    });
+    it('should throw a ForbiddenError if TokenType doesnt match', async () => {
+      MockFindTokenByToken.mockImplementation(() => {
+        return {
+          id: '222',
+          userId: '111',
+          tokenType: 'TOKEN_TYPE'
+        };
+      });
+      MockFindUserById.mockImplementation(() =>
+        Promise.resolve({
+          ...userData,
+          activities: activityData
+        })
+      );
+      await expect(authService.verifyVerificationToken('')).rejects.toThrow(
+        ForbiddenError
+      );
     });
   });
 });
