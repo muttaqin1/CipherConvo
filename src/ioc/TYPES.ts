@@ -12,6 +12,7 @@ const TYPES = {
   AuthUtils: Symbol('AuthUtils'),
   EmailService: Symbol('EmailService'),
   TwoFactorAuthToken: Symbol('TwoFactorAuthToken'),
-  TwoFactorAuthTokenRepository: Symbol('TwoFactorAuthTokenRepository')
+  TwoFactorAuthTokenRepository: Symbol('TwoFactorAuthTokenRepository'),
+  NodeMailer: Symbol('NodeMailer')
 };
 export default TYPES;

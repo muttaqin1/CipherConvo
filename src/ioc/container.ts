@@ -22,6 +22,7 @@ import EmailService from '@services/EmailService';
 import TwoFactorAuthToken from '@models/TwoFactorAuthToken';
 import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';
 import TwoFactorAuthTokenRepository from '@repositories/TwoFactorAuthTokenRepository';
+import nodeMailer from 'nodemailer';
 /**
  * @description Container for dependency injection using inversify
  * @export container - Container instance for dependency injection
@@ -73,5 +74,8 @@ container
 // helpers
 container.bind<IJsonWebToken>(TYPES.JWT).to(Jwt).inSingletonScope();
 container.bind<AuthUtils>(TYPES.AuthUtils).to(AuthUtils).inSingletonScope();
+
+// libraries
+container.bind<typeof nodeMailer>(TYPES.NodeMailer).toConstantValue(nodeMailer);
 
 export default container;
