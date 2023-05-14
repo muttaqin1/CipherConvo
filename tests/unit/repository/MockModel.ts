@@ -11,8 +11,8 @@ export default class MockModel {
   public findOne(data: any) {
     return MockFindOne(data);
   }
-  public update(data: any) {
-    return MockUpdate(data);
+  public update(data: any, data2: any) {
+    return MockUpdate(data, data2);
   }
   public destroy(data: any) {
     return MockDestroy(data);
