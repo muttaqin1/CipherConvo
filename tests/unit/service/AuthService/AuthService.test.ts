@@ -52,7 +52,7 @@ export const userData: Required<IUser> = {
   userName: 'muttaqin1',
   firstName: 'muttaqin',
   lastName: 'muhammad',
-  email: 'muttaqin@gmail.com',
+  email: 'email@gmail.com',
   password: 'muttaqin:muttaqin',
   gender: 'male',
   avatar: 'avatar',
@@ -1359,6 +1359,62 @@ describe('Class: AuthService', () => {
       expect(MockUpdateUser).toHaveBeenCalledTimes(1);
       expect(MockDeleteKeys).toHaveBeenCalledTimes(1);
       expect(MockDeleteToken).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('Method: changePassword', () => {
+    beforeEach(() => {
+      MockGeneratePassword.mockClear();
+      MockValidatePassword.mockClear();
+      MockUpdateUser.mockClear();
+      MockUpdateActivity.mockClear();
+    });
+    it('should throw BadRequestError if failed to validate password.', async () => {
+      MockValidatePassword.mockImplementation(() => Promise.resolve(false));
+      MockGeneratePassword.mockImplementation(() =>
+        Promise.resolve('muttaqin:muttaqin')
+      );
+      MockUpdateUser.mockImplementation(() => Promise.resolve());
+      try {
+        await authService.changePassword(
+          { ...userData, password: 'muttaqin:muttaqin' },
+          'muttaqin:muttaqin',
+          'muttaqin'
+        );
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestError);
+        expect((err as BaseError).message).toBe('Invalid Password');
+        expect((err as BaseError).statusCode).toBe(
+          errorStatusCodes.BAD_REQUEST
+        );
+      }
+      expect(MockValidatePassword).toHaveBeenCalledTimes(1);
+    });
+    it('should validate the password.', async () => {
+      MockValidatePassword.mockImplementation(() => Promise.resolve(true));
+      MockGeneratePassword.mockImplementation((data) => Promise.resolve(data));
+      MockUpdateUser.mockImplementation(() => Promise.resolve());
+      await authService.changePassword(
+        { ...userData, password: 'muttaqin:muttaqin' },
+        'muttaqin:muttaqin',
+        'muttaqin'
+      );
+      expect(MockValidatePassword).toHaveBeenCalledTimes(1);
+    });
+    it('should change the password.', async () => {
+      MockValidatePassword.mockImplementation(() => Promise.resolve(true));
+      MockGeneratePassword.mockImplementation(() =>
+        Promise.resolve('hashedPassword')
+      );
+      MockUpdateUser.mockImplementation(() => Promise.resolve());
+      await authService.changePassword(
+        { ...userData, password: 'muttaqin:muttaqin' },
+        userData.password as string,
+        'muttaqin'
+      );
+      expect(MockValidatePassword).toHaveBeenCalledTimes(1);
+      expect(MockGeneratePassword).toHaveBeenCalledTimes(1);
+      expect(MockUpdateUser).toHaveBeenCalledTimes(1);
+      expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
     });
   });
 });
