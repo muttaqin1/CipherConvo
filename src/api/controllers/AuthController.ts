@@ -32,6 +32,7 @@ import {
 import { deserializeUser } from '@auth/deserializeUser';
 import { signupLimiter } from '@middlewares/rateLimit';
 import IEmailService from '@interfaces/service/IEmailService';
+import { SuccessResponseCodes } from '@helpers/ApiResponse/BaseResponse';
 
 @controller('/v1/auth')
 export default class UserController implements IAuthController {
@@ -68,7 +69,9 @@ export default class UserController implements IAuthController {
       gender,
       avatar
     });
-    new ApiSuccessResponse(res).send<singupResponse>(responseData);
+    new ApiSuccessResponse(res)
+      .status(SuccessResponseCodes.CREATED)
+      .send<singupResponse>(responseData);
   }
 
   @httpDelete('/logout', deserializeUser)
@@ -77,7 +80,9 @@ export default class UserController implements IAuthController {
     @response() res: Response
   ): Promise<void> {
     await this.authService.logout(req.user);
-    new ApiSuccessResponse(res).send({ message: 'logout success' });
+    new ApiSuccessResponse(res)
+      .status(SuccessResponseCodes.NO_CONTENT)
+      .send({ message: 'logout success' });
   }
 
   @httpPut('/token-refresh', deserializeUser, validate(tokenRefreshSchema))
@@ -86,7 +91,9 @@ export default class UserController implements IAuthController {
     @response() res: Response
   ): Promise<void> {
     const responseData = await this.authService.refreshTokens(req);
-    new ApiSuccessResponse(res).send(responseData);
+    new ApiSuccessResponse(res)
+      .status(SuccessResponseCodes.CREATED)
+      .send(responseData);
   }
 
   @httpPost('/verify-account', validate(emailSchema))
@@ -96,7 +103,7 @@ export default class UserController implements IAuthController {
   ) {
     const { email } = req.body;
     await this.emailService.sendAccountVerificationEmail(email);
-    new ApiSuccessResponse(res).send({
+    new ApiSuccessResponse(res).status(SuccessResponseCodes.ACCEPTED).send({
       message: 'A verification email has been sended to your email account.'
     });
   }
@@ -105,7 +112,7 @@ export default class UserController implements IAuthController {
   public async verifyEmail(@request() req: Request, @response() res: Response) {
     const { email } = req.body;
     await this.emailService.sendEmailVerificationEmail(email);
-    new ApiSuccessResponse(res).send({
+    new ApiSuccessResponse(res).status(SuccessResponseCodes.ACCEPTED).send({
       message: 'A verification email has been sended to your email account.'
     });
   }
@@ -117,7 +124,7 @@ export default class UserController implements IAuthController {
   ) {
     const { email } = req.body;
     await this.emailService.sendForgotPasswordVerificationEmail(email);
-    new ApiSuccessResponse(res).send({
+    new ApiSuccessResponse(res).status(SuccessResponseCodes.ACCEPTED).send({
       message: 'A verification email has been sended to your email account.'
     });
   }
@@ -131,7 +138,9 @@ export default class UserController implements IAuthController {
     const result = await this.authService.verifyVerificationToken(
       token as string
     );
-    new ApiSuccessResponse(res).send(result);
+    new ApiSuccessResponse(res)
+      .status(SuccessResponseCodes.NO_CONTENT)
+      .send(result);
   }
 
   @httpPut('/reset-password/:token', validateParams(tokenSchema))
@@ -142,7 +151,7 @@ export default class UserController implements IAuthController {
     const { token } = req.params;
     const { password } = req.body;
     await this.authService.resetPassword(token as string, password);
-    new ApiSuccessResponse(res).send({
+    new ApiSuccessResponse(res).status(SuccessResponseCodes.NO_CONTENT).send({
       message: 'Password reset successfully.'
     });
   }
