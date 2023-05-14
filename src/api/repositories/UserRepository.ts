@@ -18,11 +18,7 @@ export default class UserRepository implements IUserRepository {
   ) {}
 
   public async createUser(user: userInput): Promise<userOutput | null> {
-    try {
-      return await this.userModel.create(user);
-    } catch {
-      return null;
-    }
+    return this.userModel.create(user);
   }
 
   public findUserById(
