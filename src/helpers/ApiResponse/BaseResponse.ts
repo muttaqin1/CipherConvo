@@ -4,7 +4,9 @@ import { Response } from 'express';
 
 export const SuccessResponseCodes = {
   SUCCESS: 200,
-  NO_DATA: 201
+  CREATED: 201,
+  NO_CONTENT: 204,
+  ACCEPTED: 202
 } as const;
 
 export type successResponseCodeTypes = ExtractObjValueTypes<
