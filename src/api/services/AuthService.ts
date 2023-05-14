@@ -315,6 +315,9 @@ export default class AuthService implements IAuthService {
       newPassword as Password
     );
     await this.userRepo.updateUser(user.id, { password: hashedPassword });
+    await this.activityRepo.updateActivity(user.id, {
+      passwordChangedLast: new Date()
+    });
     await this.twoFactorAuthTokenRepo.deleteToken(user.id);
     await this.authTokenKeysRepo.deleteKeys(user.id);
   }
@@ -324,12 +327,15 @@ export default class AuthService implements IAuthService {
     oldPassword: string,
     newPassword: string
   ): Promise<void> {
-    if (!user.password || !user.activities) throw new ForbiddenError();
+    if (!user.password) throw new ForbiddenError();
     const bool = this.authUtils.validatePassword(oldPassword, user.password);
     if (!bool) throw new BadRequestError('Invalid Password');
     const genNewPass = await this.authUtils.generatePassword(newPassword);
     await this.userRepo.updateUser(user.id, {
       password: genNewPass
+    });
+    await this.activityRepo.updateActivity(user.id, {
+      passwordChangedLast: new Date()
     });
   }
 }
