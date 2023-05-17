@@ -24,9 +24,6 @@ import MockActivityRepository, {
   MockUpdateActivity
 } from './MockActivityRepository';
 import MockRoleRepository, { MockCreateRole } from './MockRoleRepository';
-import IUser from '../../../../src/interfaces/models/IUser';
-import IRole from '../../../../src/interfaces/models/IRole';
-import IActivity from '../../../../src/interfaces/models/IActivity';
 import {
   AuthFailureError,
   BadRequestError,
@@ -44,41 +41,11 @@ import MockTwoFactorAuthTokenRepository, {
   MockVerifyToken
 } from './MockTwoFactorAuthTokenRepository';
 import { Request } from 'express';
-
+import userData from '../../../utils/userData';
+import roleData from '../../../utils/roleData';
+import activityData from '../../../utils/activityData';
 let authService: AuthService;
 
-export const userData: Required<IUser> = {
-  id: '111',
-  userName: 'muttaqin1',
-  firstName: 'muttaqin',
-  lastName: 'muhammad',
-  email: 'email@gmail.com',
-  password: 'muttaqin:muttaqin',
-  gender: 'male',
-  avatar: 'avatar',
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
-export const roleData: Required<IRole> = {
-  id: '222',
-  userId: '111',
-  admin: false,
-  user: true,
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
-
-export const activityData: IActivity = {
-  id: '333',
-  userId: '111',
-  failedLoginAttempts: 0,
-  emailVerified: true,
-  accessRestricted: false,
-  permanentAccessRestricted: false,
-  sendedTwoFactorAuthCodeCount: 0,
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
 describe('Class: AuthService', () => {
   beforeEach(() => {
     authService = new AuthService(
