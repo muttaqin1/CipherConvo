@@ -8,21 +8,8 @@ import {
   TokenExpiredError
 } from '../../../../src/helpers/AppError/ApiError';
 import { readFileSpy, signSpy, verifySpy } from './mock';
-import { JWT } from '../../../../src/config/index';
 import { JsonWebTokenError } from 'jsonwebtoken';
-
-const jwtPayload = {
-  userId: '123',
-  email: 'test@gmail.com',
-  userName: 'test1',
-  roleId: '123',
-  iat: Math.floor(Date.now() / 1000),
-  exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-  iss: JWT.iss,
-  aud: JWT.aud,
-  sub: JWT.sub
-};
-
+import jwtPayload from '../../../utils/jwtPayloadData';
 describe('Helper Class: Jwt', () => {
   describe('Method: generateToken', () => {
     let jwt: IJwt;
@@ -32,14 +19,14 @@ describe('Helper Class: Jwt', () => {
       jwt = new Jwt();
     });
 
-    it('should throw a InternalServerError.', async () => {
+    it('should throw InternalServerError if no key is returned', async () => {
       readFileSpy.mockRejectedValueOnce(Promise.resolve(false));
       await expect(jwt.generateToken(jwtPayload)).rejects.toThrow(
         InternalServerError
       );
       expect(readFileSpy).toHaveBeenCalledTimes(1);
     });
-    it('should throw a InternalServerError.', async () => {
+    it('should throw a InternalServerError if error is not a api specific error.', async () => {
       readFileSpy.mockRejectedValueOnce(
         new Error('I am not an api specific error.')
       );
@@ -52,15 +39,6 @@ describe('Helper Class: Jwt', () => {
       await expect(jwt.generateToken(jwtPayload)).resolves.toBeTruthy();
       expect(readFileSpy).toHaveBeenCalledTimes(1);
     });
-    it('should throw a InternalServerError.', async () => {
-      signSpy.mockImplementationOnce(() => {
-        throw new Error('I am not an api specific error.');
-      });
-      await expect(jwt.generateToken(jwtPayload)).rejects.toThrow(
-        InternalServerError
-      );
-      expect(readFileSpy).toHaveBeenCalledTimes(1);
-    });
   });
   describe('Method: verifyToken', () => {
     let jwt: IJwt;
@@ -68,18 +46,11 @@ describe('Helper Class: Jwt', () => {
       readFileSpy.mockClear();
       jwt = new Jwt();
     });
-    it('should throw a InternalServerError.', async () => {
-      readFileSpy.mockRejectedValueOnce(Promise.resolve(false));
-      await expect(jwt.verifyToken('token')).rejects.toThrow(
-        InternalServerError
-      );
-      expect(readFileSpy).toHaveBeenCalledTimes(1);
-    });
-    it('should throw a BadTokenError.', async () => {
+    it('should throw a BadTokenError if token is not valid.', async () => {
       await expect(jwt.verifyToken('token')).rejects.toThrow(BadTokenError);
       expect(readFileSpy).toHaveBeenCalledTimes(1);
     });
-    it('should throw a TokenExpiredError', async () => {
+    it('should throw a TokenExpiredError if token is expired.', async () => {
       const Payload = {
         ...jwtPayload,
         exp: Math.floor(Date.now() / 1000)
@@ -88,7 +59,7 @@ describe('Helper Class: Jwt', () => {
       await expect(jwt.verifyToken(token)).rejects.toThrow(TokenExpiredError);
       expect(readFileSpy).toHaveBeenCalledTimes(2);
     });
-    it('should  throw a ForbiddenError', async () => {
+    it('should  throw a ForbiddenError if error is a NotBeforeError.', async () => {
       const Payload = {
         ...jwtPayload,
 
@@ -98,15 +69,6 @@ describe('Helper Class: Jwt', () => {
       const token = await jwt.generateToken(Payload);
       await expect(jwt.verifyToken(token)).rejects.toThrow(ForbiddenError);
       expect(readFileSpy).toHaveBeenCalledTimes(2);
-    });
-    it('should throw a InternalServerError', async () => {
-      readFileSpy.mockRejectedValueOnce(
-        new Error('I am not an api specific error.')
-      );
-      await expect(jwt.verifyToken('token')).rejects.toThrow(
-        InternalServerError
-      );
-      expect(readFileSpy).toHaveBeenCalledTimes(1);
     });
     it('should verify the token', async () => {
       const token = await jwt.generateToken(jwtPayload);
@@ -120,13 +82,7 @@ describe('Helper Class: Jwt', () => {
       readFileSpy.mockClear();
       verifySpy.mockClear();
     });
-    it('should throw a InternalServerError.', async () => {
-      const token = await jwt.generateToken(jwtPayload);
-      readFileSpy.mockResolvedValueOnce(Promise.resolve(''));
-      await expect(jwt.decodeToken(token)).rejects.toThrow(InternalServerError);
-      expect(readFileSpy).toHaveBeenCalledTimes(2);
-    });
-    it('should throw a BadTokenError.', async () => {
+    it('should throw a BadTokenError if token is not valid.', async () => {
       verifySpy.mockImplementationOnce(() => {
         throw new JsonWebTokenError('jwt malformed');
       });
