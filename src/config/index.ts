@@ -25,7 +25,7 @@ export const JWT = {
   refreshTokenExpiry:
     Number(process.env.JWT_REFRESH_TOKEN_EXPIRY) || 1000 * 60 * 60 * 24 * 30
 } as const;
-export const corsURL = ['http://localhost:3000', 'http://localhost:8080'];
+export const corsOrigins = ['http://localhost:8080'];
 export const smtp = {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT) || 465,

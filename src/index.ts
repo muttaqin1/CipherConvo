@@ -2,13 +2,15 @@ import { sequelize } from '@database/index';
 import sync from '@database/sync';
 import { port } from '@config/index';
 import Logger from '@helpers/Logger';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import { customOrigin } from '@middlewares/cors';
 import App from './App';
 // handle uncaughtException and exit the application with code 1.
 process.on('uncaughtException', (err) => {
   Logger.error(`Uncaught Exception ${err}`);
   process.exit(1);
 });
-
 sequelize
   .authenticate({ logging: false })
   .then(() => {
@@ -24,8 +26,17 @@ sequelize
   .catch((err) => {
     Logger.error('Unable to connect to the database:', err);
   });
+const server = createServer(App);
+const options = {
+  cors: {
+    origin: customOrigin,
+    credentials: true
+  }
+};
+const io = new Server(server, options);
+io.on('connection', () => {});
 
-const expServer = App.listen(port, () => {
+const expServer = server.listen(port, () => {
   Logger.info(`Server is running on port ${port}`);
 });
 // handle unhandledRejection and exit the application with code 1.
