@@ -163,7 +163,7 @@ export default class UserController implements IAuthController {
   ) {
     const { oldPassword, newPassword } = req.body;
     await this.authService.changePassword(req.user, oldPassword, newPassword);
-    new ApiSuccessResponse(res).send({
+    new ApiSuccessResponse(res).status(SuccessResponseCodes.NO_CONTENT).send({
       message: 'Password changed successfully.'
     });
   }

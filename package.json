@@ -9,6 +9,7 @@
     "dev": "NODE_ENV=DEVELOPMENT ts-node-dev --respawn --quiet  --clear --rs -r tsconfig-paths/register ./src/index.ts",
     "prod": "NODE_ENV=PRODUCTION node ./dist/index.js",
     "unit-test": "jest --testPathPattern=tests/unit",
+    "integration-test": "jest --testPathPattern=tests/integration",
     "build": "tsc && tsc-alias"
   },
   "devDependencies": {
