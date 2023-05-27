@@ -1,8 +1,4 @@
 import ApiSuccessResponse from '@helpers/ApiResponse/ApiSuccessResponse';
-import {
-  loginResponse,
-  singupResponse
-} from '@interfaces/response/authContollerResponse';
 import TYPES from '@ioc/TYPES';
 import { Response } from 'express';
 import Request from '@interfaces/request';
@@ -52,7 +48,7 @@ export default class UserController implements IAuthController {
       email,
       password
     });
-    new ApiSuccessResponse(res).send<loginResponse>(responseData);
+    new ApiSuccessResponse(res).send(responseData);
   }
 
   @httpPost('/signup', signupLimiter, validate(signupSchema))
@@ -71,7 +67,7 @@ export default class UserController implements IAuthController {
     });
     new ApiSuccessResponse(res)
       .status(SuccessResponseCodes.CREATED)
-      .send<singupResponse>(responseData);
+      .send(responseData);
   }
 
   @httpDelete('/logout', deserializeUser)
@@ -85,7 +81,11 @@ export default class UserController implements IAuthController {
       .send({ message: 'logout success' });
   }
 
-  @httpPut('/token-refresh', deserializeUser, validate(tokenRefreshSchema))
+  @httpPut(
+    '<singupResponse>/token-refresh',
+    deserializeUser,
+    validate(tokenRefreshSchema)
+  )
   public async tokenRefresh(
     @request() req: Request,
     @response() res: Response

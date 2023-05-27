@@ -33,7 +33,6 @@ import {
 import BaseError from '../../../../src/helpers/AppError/BaseError';
 import { errorStatusCodes } from '../../../../src/helpers/AppError/errorStatusCodes';
 import errorMessages from '../../../../src/helpers/AppError/errorMessages';
-import { loginResponse } from '../../../../src/interfaces/response/authContollerResponse';
 import MockTwoFactorAuthTokenRepository, {
   MockDeleteToken,
   MockFindTokenById,
@@ -446,7 +445,7 @@ describe('Class: AuthService', () => {
         email: 'test@gmail.com',
         password: 'test'
       });
-      expect(response).toStrictEqual<loginResponse>({
+      expect(response).toStrictEqual({
         user: {
           id: userData.id,
           firstName: userData.firstName,

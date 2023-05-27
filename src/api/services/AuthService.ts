@@ -9,23 +9,23 @@ import IAuthTokenKeysRepository from '@interfaces/repository/IAuthTokenKeysRepos
 import IUserRepository, {
   UserIncludedRolesAndActivities
 } from '@interfaces/repository/IUserRepository';
-import {
-  loginResponse,
-  singupResponse
-} from '@interfaces/response/authContollerResponse';
 import IToken from '@interfaces/auth/IToken';
 import TYPES from '@ioc/TYPES';
 import { randomBytes } from 'crypto';
 import { inject, injectable } from 'inversify';
-import IAuthService from '@interfaces/service/IAuthService';
-import { userInput } from '@models/User';
+import IAuthService, {
+  ILoginOutput,
+  ISingupOutput,
+  IVerifyVerificationTokenOutput
+} from '@interfaces/service/IAuthService';
 import IActivityRepository from '@interfaces/repository/IActivityRepository';
 import IRoleRepository from '@interfaces/repository/IRoleRepository';
-import { Password } from '@interfaces/models/IUser';
+import IUser, { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
 import IRole from '@interfaces/models/IRole';
 import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';
 import { TokenType } from '@interfaces/models/ITwoFactorAuthToken';
+import { ILoginDto, ISignupDto } from '@interfaces/dtos/AuthControllerDtos';
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -41,11 +41,7 @@ export default class AuthService implements IAuthService {
     private readonly twoFactorAuthTokenRepo: ITwoFactorAuthTokenRepository
   ) {}
 
-  public async login(loginCredentials: {
-    userName?: string;
-    email?: string;
-    password: string;
-  }): Promise<loginResponse> {
+  public async login(loginCredentials: ILoginDto): Promise<ILoginOutput> {
     const { userName, email, password } = loginCredentials;
     let user;
     // check if the user is registered with the provided email or username.
@@ -143,7 +139,7 @@ export default class AuthService implements IAuthService {
     };
   }
 
-  public async signup(userData: userInput): Promise<singupResponse> {
+  public async signup(userData: ISignupDto): Promise<ISingupOutput> {
     // check if the user is registered with the provided email.
     const userEmail = await this.userRepo.findUserByEmail(userData.email);
     if (userEmail)
@@ -254,11 +250,9 @@ export default class AuthService implements IAuthService {
     return tokens;
   }
 
-  public async verifyVerificationToken(token: string): Promise<{
-    emailVerified?: boolean;
-    accountVerified?: boolean;
-    tokenId?: string;
-  }> {
+  public async verifyVerificationToken(
+    token: string
+  ): Promise<IVerifyVerificationTokenOutput> {
     const tokenData = await this.twoFactorAuthTokenRepo.findTokenByToken(token);
     if (!tokenData) throw new BadRequestError('Invalid Token');
     const user = await this.userRepo.findUserById(tokenData.userId, {

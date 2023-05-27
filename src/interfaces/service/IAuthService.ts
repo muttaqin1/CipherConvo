@@ -1,26 +1,35 @@
 import { UserIncludedRolesAndActivities } from '@interfaces/repository/IUserRepository';
-import {
-  loginResponse,
-  singupResponse
-} from '@interfaces/response/authContollerResponse';
 import { userInput } from '@models/User';
 import { Request } from 'express';
 import IToken from '@interfaces/auth/IToken';
+import IUser from '@interfaces/models/IUser';
+import IRole from '@interfaces/models/IRole';
+import { ILoginDto, ISignupDto } from '@interfaces/dtos/AuthControllerDtos';
+
+export interface ILoginOutput {
+  user: Omit<Required<IUser>, 'password'>;
+  roles: Required<IRole>;
+  tokens: IToken;
+}
+export interface ISingupOutput {
+  user: Omit<Required<IUser>, 'password'>;
+  role: Required<IRole>;
+  tokens: IToken;
+}
+export interface IVerifyVerificationTokenOutput {
+  emailVerified?: boolean;
+  accountVerified?: boolean;
+  tokenId?: string;
+}
 
 export default interface IAuthService {
-  login(loginCredentials: {
-    userName?: string;
-    email?: string;
-    password: string;
-  }): Promise<loginResponse>;
-  signup(userData: userInput): Promise<singupResponse>;
+  login(loginCredentials: ILoginDto): Promise<ILoginOutput>;
+  signup(userData: ISignupDto): Promise<ISingupOutput>;
   logout(user: UserIncludedRolesAndActivities): Promise<void>;
   refreshTokens(req: Request): Promise<IToken>;
-  verifyVerificationToken(token: string): Promise<{
-    emailVerified?: boolean;
-    accountVerified?: boolean;
-    tokenId?: string;
-  }>;
+  verifyVerificationToken(
+    token: string
+  ): Promise<IVerifyVerificationTokenOutput>;
   resetPassword(token: string, newPassword: string): Promise<void>;
   changePassword(
     user: UserIncludedRolesAndActivities,
