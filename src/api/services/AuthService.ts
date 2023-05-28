@@ -20,7 +20,7 @@ import IAuthService, {
 } from '@interfaces/service/IAuthService';
 import IActivityRepository from '@interfaces/repository/IActivityRepository';
 import IRoleRepository from '@interfaces/repository/IRoleRepository';
-import IUser, { Password } from '@interfaces/models/IUser';
+import { Password } from '@interfaces/models/IUser';
 import { Request } from 'express';
 import IRole from '@interfaces/models/IRole';
 import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';

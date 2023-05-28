@@ -14,6 +14,12 @@ const swaggerSpecPath = path.join(__dirname, '../../../swagger.yaml');
 const swaggerSpec = yaml.load(swaggerSpecPath);
 // Merge the swagger.yaml file with the swagger annotations
 swaggerSpec.paths = mergeYamlFiles(docsDirPath);
+swaggerSpec.servers = [
+  {
+    url: `http://localhost:${port}/api/v1`,
+    description: 'Development server'
+  }
+];
 
 export default (app: Application): void => {
   if (IsProduction()) return;

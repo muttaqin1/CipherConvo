@@ -7,20 +7,22 @@ import cors from 'cors';
 import compression from 'compression';
 import { IsProduction } from '@config/index';
 import Container from '@ioc/container';
+import swaggerDocs from '@helpers/swagger';
 import {
   customOrigin,
   globalErrorHandler,
   Morgan,
-  shouldCompress
+  shouldCompress,
+  apiLimiter
 } from '@middlewares/index';
 import '@middlewares/notFoundHandler';
 import '@controllers/AuthController';
-import { apiLimiter } from '@middlewares/rateLimit';
 
 const server = new InversifyExpressServer(Container, null, {
   rootPath: '/api'
 });
 server.setConfig((app: Application) => {
+  swaggerDocs(app);
   app.use('/api', apiLimiter);
   app.use(express.json());
   app.use((req, _, next) => {
