@@ -43,6 +43,7 @@ import { Request } from 'express';
 import userData from '../../../utils/userData';
 import roleData from '../../../utils/roleData';
 import activityData from '../../../utils/activityData';
+import _ from 'lodash';
 let authService: AuthService;
 
 describe('Class: AuthService', () => {
@@ -534,7 +535,7 @@ describe('Class: AuthService', () => {
         Promise.resolve('hashedPassword')
       );
       MockCreateUser.mockImplementation(() => Promise.resolve(true));
-      await expect(authService.signup(userData)).rejects.toThrowError();
+      await expect(authService.signup(userData)).resolves.toBeTruthy();
       expect(MockCreateUser).toBeCalledTimes(1);
       expect(MockCreateUser).toBeCalledWith({
         ...userData,
@@ -689,7 +690,7 @@ describe('Class: AuthService', () => {
       );
       const response = await authService.signup(userData);
       expect(response).toStrictEqual({
-        user: userData,
+        user: _.omit(userData, ['password']),
         role: roleData,
         tokens: {
           accessToken: 'token',

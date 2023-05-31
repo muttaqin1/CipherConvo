@@ -9,6 +9,6 @@ export default {
   password: 'muttaqin:muttaqin',
   gender: 'male',
   avatar: 'avatar',
-  createdAt: new Date(),
-  updatedAt: new Date()
-} as Required<IUser>;
+  createdAt: '2021-01-01T00:00:00.000Z',
+  updatedAt: '2021-01-01T00:00:00.000Z'
+} as unknown as Required<IUser>;

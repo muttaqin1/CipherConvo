@@ -28,6 +28,7 @@ import ITwoFactorAuthTokenRepository from '../../../src/interfaces/repository/IT
 import userData from '../../utils/userData';
 import roleData from '../../utils/roleData';
 import activityData from '../../utils/activityData';
+import _ from 'lodash';
 let authService: AuthService;
 let mockModel: any;
 let mockJwt: any;
@@ -92,7 +93,7 @@ describe('Class: AuthService', () => {
         .mockReturnValueOnce(true);
 
       expect(await authService.signup(userData)).toStrictEqual({
-        user: { ...userData, password: null },
+        user: { ..._.omit(userData, 'password') },
         role: roleData,
         tokens: { accessToken: 'token', refreshToken: 'token' }
       });

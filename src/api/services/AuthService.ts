@@ -26,6 +26,7 @@ import IRole from '@interfaces/models/IRole';
 import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';
 import { TokenType } from '@interfaces/models/ITwoFactorAuthToken';
 import { ILoginDto, ISignupDto } from '@interfaces/dtos/AuthControllerDtos';
+import _ from 'lodash';
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -123,17 +124,12 @@ export default class AuthService implements IAuthService {
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
     return {
-      user: {
-        id: user.id,
-        userName: user.userName,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        gender: user.gender,
-        email: user.email,
-        avatar: user.avatar,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
-      },
+      // @ts-ignore
+      user: _.omit(JSON.parse(JSON.stringify(user)), [
+        'password',
+        'roles',
+        'activities'
+      ]),
       roles: user.roles,
       tokens
     };
@@ -186,10 +182,9 @@ export default class AuthService implements IAuthService {
     );
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
-    // remove password and from user object.
-    user.password = null;
     return {
-      user,
+      // @ts-ignore
+      user: _.omit(JSON.parse(JSON.stringify(user)), ['password']),
       role,
       tokens
     };

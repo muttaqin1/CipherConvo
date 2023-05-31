@@ -1,5 +1,4 @@
 import { UserIncludedRolesAndActivities } from '@interfaces/repository/IUserRepository';
-import { userInput } from '@models/User';
 import { Request } from 'express';
 import IToken from '@interfaces/auth/IToken';
 import IUser from '@interfaces/models/IUser';
