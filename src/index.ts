@@ -49,7 +49,7 @@ process.on('unhandledRejection', (err) => {
 process.on('SIGTERM', () => {
   expServer.close(async () => {
     await sequelize.close();
-    Logger.info('Process terminated with SIGTERM signal.');
+    Logger.info('PROCESS TERMINATED WITH SIGTERM SIGNAL');
     process.exit(0);
   });
 });
@@ -57,7 +57,7 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   expServer.close(async () => {
     await sequelize.close();
-    Logger.info('Process terminated with SIGINT signal.');
+    Logger.info('PROCESS TERMINATED WITH SIGINT SIGNAL');
     process.exit(0);
   });
 });

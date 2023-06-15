@@ -1,13 +1,13 @@
 import { Container } from 'inversify';
 import IJsonWebToken from '@interfaces/helpers/IJsonWebToken';
-import Jwt from '@helpers/Jwt';
+import Jwt from '@helpers/auth/Jwt';
 import User from '@models/User';
 import IUserRepository from '@interfaces/repository/IUserRepository';
 import UserRepository from '@repositories/UserRepository';
 import AuthTokenKeys from '@models/AuthTokenKeys';
 import AuthTokenKeysRepository from '@repositories/AuthTokenKeysRepository';
 import IAuthTokenKeysRepository from '@interfaces/repository/IAuthTokenKeysRepository';
-import AuthUtils from '@helpers/AuthUtils';
+import AuthUtils from '@helpers/auth/AuthUtils';
 import TYPES from '@ioc/TYPES';
 import Role from '@models/Role';
 import Activity from '@models/Activity';
