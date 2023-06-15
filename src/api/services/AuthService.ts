@@ -259,7 +259,7 @@ export default class AuthService implements IAuthService {
       tokenData.tokenType === TokenType.VERIFY_ACCOUNT &&
       !user.activities.accessRestricted
     )
-      throw new BadRequestError('Account already verified');
+      throw new BadRequestError('Account is not restricted');
     if (
       user.activities.emailVerified &&
       tokenData.tokenType === TokenType.VERIFY_EMAIL
@@ -274,7 +274,8 @@ export default class AuthService implements IAuthService {
     }
     if (tokenData.tokenType === TokenType.VERIFY_ACCOUNT) {
       await this.activityRepo.updateActivity(user.id, {
-        accessRestricted: false
+        accessRestricted: false,
+        emailVerified: true
       });
       await this.twoFactorAuthTokenRepo.deleteToken(user.id);
       return {

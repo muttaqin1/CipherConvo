@@ -147,4 +147,83 @@ describe('Class: AuthService', () => {
       });
     });
   });
+
+  describe('Method: verifyVerificationToken', () => {
+    beforeEach(() => {
+      MockFindOne.mockClear();
+      MockUpdate.mockClear();
+      MockDestroy.mockClear();
+    });
+    it('should return verify account output.', async () => {
+      MockFindOne.mockReturnValueOnce({
+        userId: '32323',
+        tokenType: 'VERIFY_ACCOUNT'
+      }).mockReturnValueOnce({
+        ...userData,
+        activities: { ...activityData, accessRestricted: true }
+      });
+      await expect(
+        authService.verifyVerificationToken('1323232')
+      ).resolves.toStrictEqual({
+        accountVerified: true
+      });
+      expect(MockUpdate).toHaveReturnedTimes(1);
+      expect(MockDestroy).toHaveBeenCalledTimes(1);
+    });
+    it('should return verify email output.', async () => {
+      MockFindOne.mockReturnValueOnce({
+        userId: '32323',
+        tokenType: 'VERIFY_EMAIL'
+      }).mockReturnValueOnce({
+        ...userData,
+        activities: {
+          ...activityData,
+          accessRestricted: false,
+          emailVerified: false
+        }
+      });
+      await expect(
+        authService.verifyVerificationToken('1323232')
+      ).resolves.toStrictEqual({
+        emailVerified: true
+      });
+      expect(MockUpdate).toHaveReturnedTimes(1);
+      expect(MockDestroy).toHaveBeenCalledTimes(1);
+    });
+    it('should return the tokenId for reset password.', async () => {
+      MockFindOne.mockReturnValueOnce({
+        userId: '32323',
+        id: '1111',
+        tokenType: 'RESET_PASSWORD'
+      }).mockReturnValueOnce({
+        ...userData,
+        activities: {
+          ...activityData,
+          accessRestricted: false,
+          emailVerified: false
+        }
+      });
+      await expect(
+        authService.verifyVerificationToken('ddwr23')
+      ).resolves.toStrictEqual({
+        tokenId: '1111'
+      });
+    });
+  });
+  describe('Method: resetPassword', () => {
+    it('should return reset password output.', async () => {
+      MockUpdate.mockClear();
+      MockDestroy.mockClear();
+      MockFindOne.mockReturnValueOnce({
+        id: '1111',
+        userId: '3333',
+        tokenType: 'RESET_PASSWORD'
+      }).mockReturnValueOnce(userData);
+      await expect(
+        authService.resetPassword('token', 'password')
+      ).resolves.toBeUndefined();
+      expect(MockUpdate).toHaveBeenCalledTimes(2);
+      expect(MockDestroy).toHaveBeenCalledTimes(2);
+    });
+  });
 });
