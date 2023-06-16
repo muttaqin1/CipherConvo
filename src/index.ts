@@ -1,10 +1,12 @@
+import 'reflect-metadata';
 import { sequelize } from '@database/index';
 import sync from '@database/sync';
-import { port } from '@config/index';
+import { clientURL, port } from '@config/index';
 import Logger from '@helpers/Logger';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { customOrigin } from '@middlewares/cors';
+import socketHandler from '@helpers/socket/socketHandler';
+import { authorizeSocket, UserSocket } from '@auth/authorizeSocket';
 import App from './App';
 // handle uncaughtException and exit the application with code 1.
 process.on('uncaughtException', (err) => {
@@ -29,12 +31,13 @@ sequelize
 const server = createServer(App);
 const options = {
   cors: {
-    origin: customOrigin,
-    credentials: true
+    origin: clientURL
   }
 };
 const io = new Server(server, options);
-io.on('connection', () => {});
+const hashmap = new Map<string, UserSocket>();
+io.use(authorizeSocket(hashmap));
+socketHandler(io, hashmap);
 
 const expServer = server.listen(port, () => {
   Logger.info(`Server is running on port ${port}`);
