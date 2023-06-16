@@ -20,6 +20,7 @@ export default interface IAuthUtils {
     refreshTokenKey: string
   ): Promise<IToken>;
   verifyAccessToken(req: Request): Promise<JwtPayload>;
+  verifySocketAccessToken(token: string): Promise<JwtPayload>;
   decodeAccessToken(req: Request): Promise<JwtPayload>;
   verifyRefreshToken(refreshToken: string): Promise<JwtPayload>;
 }

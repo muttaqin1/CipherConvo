@@ -1,4 +1,4 @@
-import { AuthFailureError } from '@helpers/AppError/ApiError';
+import { AuthFailureError, ForbiddenError } from '@helpers/AppError/ApiError';
 import IAuthUtils from '@interfaces/helpers/IAuthUtils';
 import AuthTokenKeysRepository from '@repositories/AuthTokenKeysRepository';
 import TYPES from '@ioc/TYPES';
@@ -7,9 +7,13 @@ import IUserRepository from '@interfaces/repository/IUserRepository';
 import { Socket } from 'socket.io';
 import { ExtendedError } from 'socket.io/dist/namespace';
 
-export const authorizeSocket = (hashmap: Map<string, Socket>) =>
+export type UserSocket = Socket & { userId: string };
+
+export type HashMap = Map<string, UserSocket>;
+
+export const authorizeSocket = (hashmap: HashMap) =>
   (async (
-    socket: Socket & { userId: string },
+    socket: UserSocket,
     next: (err?: ExtendedError) => void
   ): Promise<void> => {
     try {
@@ -20,8 +24,9 @@ export const authorizeSocket = (hashmap: Map<string, Socket>) =>
       const userRepository = container.get<IUserRepository>(
         TYPES.UserRepository
       );
+      if (!socket.handshake.auth.token) throw new ForbiddenError();
       // Verify access token
-      const payload = await authUtils.verifyAccessToken(
+      const payload = await authUtils.verifySocketAccessToken(
         socket.handshake.auth.token
       );
       // Find user
