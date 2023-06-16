@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import Jwt from '../../../../src/helpers/Jwt';
+import Jwt from '../../../../src/helpers/auth/Jwt';
 import IJwt from '../../../../src/interfaces/helpers/IJsonWebToken';
 import {
   BadTokenError,

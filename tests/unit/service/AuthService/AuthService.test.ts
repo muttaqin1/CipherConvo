@@ -534,7 +534,7 @@ describe('Class: AuthService', () => {
       MockGeneratePassword.mockImplementation(() =>
         Promise.resolve('hashedPassword')
       );
-      MockCreateUser.mockImplementation(() => Promise.resolve(true));
+      MockCreateUser.mockImplementation(() => Promise.resolve(userData));
       await expect(authService.signup(userData)).resolves.toBeTruthy();
       expect(MockCreateUser).toBeCalledTimes(1);
       expect(MockCreateUser).toBeCalledWith({
@@ -690,7 +690,7 @@ describe('Class: AuthService', () => {
       );
       const response = await authService.signup(userData);
       expect(response).toStrictEqual({
-        user: _.omit(userData, ['password']),
+        user: _.omit(userData, ['password', 'toJSON']),
         role: roleData,
         tokens: {
           accessToken: 'token',
@@ -1120,7 +1120,7 @@ describe('Class: AuthService', () => {
         await authService.verifyVerificationToken('');
       } catch (err) {
         expect(err).toBeInstanceOf(BadRequestError);
-        expect((err as BaseError).message).toBe('Account already verified');
+        expect((err as BaseError).message).toBe('Account is not restricted');
         expect((err as BaseError).statusCode).toBe(
           errorStatusCodes.BAD_REQUEST
         );
@@ -1198,7 +1198,8 @@ describe('Class: AuthService', () => {
       });
       expect(MockUpdateActivity).toHaveBeenCalledTimes(1);
       expect(MockUpdateActivity).toHaveBeenCalledWith('111', {
-        accessRestricted: false
+        accessRestricted: false,
+        emailVerified: true
       });
       expect(MockDeleteToken).toHaveBeenCalledTimes(1);
       expect(MockDeleteToken).toHaveBeenCalledWith('111');

@@ -1,6 +1,6 @@
 import IUser from '../../src/interfaces/models/IUser';
 
-export default {
+const userData = {
   id: '111',
   userName: 'muttaqin1',
   firstName: 'muttaqin',
@@ -12,3 +12,8 @@ export default {
   createdAt: '2021-01-01T00:00:00.000Z',
   updatedAt: '2021-01-01T00:00:00.000Z'
 } as unknown as Required<IUser>;
+
+export default {
+  ...userData,
+  toJSON: () => userData
+};

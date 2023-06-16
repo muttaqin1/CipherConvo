@@ -5,7 +5,7 @@ import {
   MockJwt,
   mockVerifyToken
 } from './mock';
-import AuthUtils from '../../../../src/helpers/AuthUtils';
+import AuthUtils from '../../../../src/helpers/auth/AuthUtils';
 import IJsonWebToken from '../../../../src/interfaces/helpers/IJsonWebToken';
 import { randomBytes } from 'crypto';
 import IUser, { Password } from '../../../../src/interfaces/models/IUser';

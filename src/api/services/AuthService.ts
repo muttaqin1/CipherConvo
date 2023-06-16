@@ -124,12 +124,11 @@ export default class AuthService implements IAuthService {
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
     return {
-      // @ts-ignore
-      user: _.omit(JSON.parse(JSON.stringify(user)), [
+      user: _.omit((user as any).toJSON(), [
         'password',
         'roles',
         'activities'
-      ]),
+      ]) as any,
       roles: user.roles,
       tokens
     };
@@ -183,8 +182,7 @@ export default class AuthService implements IAuthService {
     // If tokens are not generated, throw an error.
     if (!tokens) throw new InternalServerError();
     return {
-      // @ts-ignore
-      user: _.omit(JSON.parse(JSON.stringify(user)), ['password']),
+      user: _.omit((user as any).toJSON(), ['password']) as any,
       role,
       tokens
     };

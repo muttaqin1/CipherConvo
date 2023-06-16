@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import AuthService from '../../../src/api/services/AuthService';
 import UserRepository from '../../../src/api/repositories/UserRepository';
 import RoleRepository from '../../../src/api/repositories/RoleRepository';
-import AuthUtils from '../../../src/helpers/AuthUtils';
+import AuthUtils from '../../../src/helpers/auth/AuthUtils';
 import AuthTokenKeysRepository from '../../../src/api/repositories/AuthTokenKeysRepository';
 import ActivityRepository from '../../../src/api/repositories/ActivityRepository';
 import TwoFactorAuthTokenRepository from '../../../src/api/repositories/TwoFactorAuthTokenRepository';
@@ -74,11 +74,8 @@ describe('Class: AuthService', () => {
         userName: userData.userName,
         password: userData.password as Password
       });
-      const data = { ...userData };
-      // @ts-ignore
-      delete data.password;
       expect(tokens).toStrictEqual({
-        user: data,
+        user: _.omit(userData, ['password', 'toJSON']),
         roles: roleData,
         tokens: { accessToken: 'token', refreshToken: 'token' }
       });
@@ -93,7 +90,7 @@ describe('Class: AuthService', () => {
         .mockReturnValueOnce(true);
 
       expect(await authService.signup(userData)).toStrictEqual({
-        user: { ..._.omit(userData, 'password') },
+        user: _.omit(userData, ['password', 'toJSON']) as any,
         role: roleData,
         tokens: { accessToken: 'token', refreshToken: 'token' }
       });

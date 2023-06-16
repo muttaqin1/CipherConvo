@@ -165,4 +165,17 @@ export default class AuthUtils implements IAuthUtils {
     if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
     return payload;
   }
+
+  public async verifySocketAccessToken(token: string): Promise<JwtPayload> {
+    try {
+      const payload = await this.jwt.verifyToken(token);
+      if (!payload) throw new AuthFailureError();
+      if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
+      return payload;
+    } catch (err) {
+      if (err instanceof BadTokenError || err instanceof TokenExpiredError)
+        throw new AccessTokenError();
+      else throw err;
+    }
+  }
 }
