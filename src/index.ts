@@ -35,9 +35,9 @@ const options = {
   }
 };
 const io = new Server(server, options);
-const hashmap = new Map<string, UserSocket>();
-io.use(authorizeSocket(hashmap));
-socketHandler(io, hashmap);
+const socketMap = new Map<string, UserSocket>();
+io.use(authorizeSocket(socketMap));
+socketHandler(io, socketMap);
 
 const expServer = server.listen(port, () => {
   Logger.info(`Server is running on port ${port}`);
