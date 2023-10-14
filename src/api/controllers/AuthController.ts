@@ -40,7 +40,7 @@ export default class UserController implements IAuthController {
   @httpPost('/login', validate(loginSchema))
   public async login(
     @request() req: Request,
-    @response() res: Response
+      @response() res: Response
   ): Promise<void> {
     const { userName, email, password } = req.body;
     const responseData = await this.authService.login({
@@ -53,8 +53,9 @@ export default class UserController implements IAuthController {
 
   @httpPost('/signup', signupLimiter, validate(signupSchema))
   public async signup(@request() req: Request, @response() res: Response) {
-    const { userName, firstName, lastName, email, password, gender, avatar } =
-      req.body;
+    const {
+      userName, firstName, lastName, email, password, gender, avatar
+    } = req.body;
 
     const responseData = await this.authService.signup({
       userName,
@@ -73,7 +74,7 @@ export default class UserController implements IAuthController {
   @httpDelete('/logout', deserializeUser)
   public async logout(
     @request() req: Request,
-    @response() res: Response
+      @response() res: Response
   ): Promise<void> {
     await this.authService.logout(req.user);
     new ApiSuccessResponse(res)
@@ -82,13 +83,13 @@ export default class UserController implements IAuthController {
   }
 
   @httpPut(
-    '<singupResponse>/token-refresh',
+    '/token-refresh',
     deserializeUser,
     validate(tokenRefreshSchema)
   )
   public async tokenRefresh(
     @request() req: Request,
-    @response() res: Response
+      @response() res: Response
   ): Promise<void> {
     const responseData = await this.authService.refreshTokens(req);
     new ApiSuccessResponse(res)
@@ -98,7 +99,7 @@ export default class UserController implements IAuthController {
 
   @httpPost('/verify-account', validate(emailSchema))
   public async verifyAccount(
-    @request() req: Request,
+  @request() req: Request,
     @response() res: Response
   ) {
     const { email } = req.body;
@@ -119,7 +120,7 @@ export default class UserController implements IAuthController {
 
   @httpPost('/forgot-password', validate(emailSchema))
   public async forgotPassword(
-    @request() req: Request,
+  @request() req: Request,
     @response() res: Response
   ) {
     const { email } = req.body;
@@ -131,7 +132,7 @@ export default class UserController implements IAuthController {
 
   @httpGet('/verify-verification-token/:token', validateParams(tokenSchema))
   public async verifyVerificationToken(
-    @request() req: Request,
+  @request() req: Request,
     @response() res: Response
   ) {
     const { token } = req.params;
@@ -145,7 +146,7 @@ export default class UserController implements IAuthController {
 
   @httpPut('/reset-password/:token', validateParams(tokenSchema))
   public async resetPassword(
-    @request() req: Request,
+  @request() req: Request,
     @response() res: Response
   ) {
     const { token } = req.params;
@@ -158,7 +159,7 @@ export default class UserController implements IAuthController {
 
   @httpPut('/change-password', deserializeUser)
   public async changePassword(
-    @request() req: Request,
+  @request() req: Request,
     @response() res: Response
   ) {
     const { oldPassword, newPassword } = req.body;
