@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryParam, response, requestParam, httpPatch, httpPut, params } from "inversify-express-utils";
+import { interfaces, controller, httpGet, httpDelete, request, response, httpPut } from "inversify-express-utils";
 import { inject } from "inversify";
 import UserRepository from '@repositories/UserRepository';
 import TYPES from '@ioc/TYPES';
