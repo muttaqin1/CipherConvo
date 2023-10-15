@@ -1,13 +1,13 @@
 import { Server } from 'socket.io';
 import SocketEvents from '@helpers/socket/SocketEvents';
-import { UserSocket, HashMap } from '@auth/authorizeSocket';
+import { UserSocket, SocketMap } from '@auth/authorizeSocket';
 
-export default (io: Server, hashmap: HashMap) => {
+export default (io: Server, socketMap: SocketMap) => {
   io.on('connection', (socket) => {
     const userSocket = socket as UserSocket;
-    const socketEvents = new SocketEvents(io, userSocket, hashmap);
+    const socketEvents = new SocketEvents(io, userSocket, socketMap);
     userSocket.on('userMsg', socketEvents.message);
 
-    userSocket.on('disconnect', () => hashmap.delete(userSocket.userId));
+    userSocket.on('disconnect', () => socketMap.delete(userSocket.userId));
   });
 };

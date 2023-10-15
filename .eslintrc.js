@@ -10,7 +10,6 @@ module.exports = {
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/typescript',
-    // 'prettier'
   ],
   overrides: [],
   parser: '@typescript-eslint/parser',
@@ -19,7 +18,7 @@ module.exports = {
     sourceType: 'module',
     project: path.join(currentPath, 'tsconfig.json')
   },
-  plugins: ['prettier', '@typescript-eslint', 'import'],
+  plugins: ['prettier', '@typescript-eslint'],
   rules: {
     'class-methods-use-this': 'off',
     'import/prefer-default-export': 'off',
