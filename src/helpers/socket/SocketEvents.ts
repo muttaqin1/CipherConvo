@@ -1,11 +1,11 @@
 import { Server } from 'socket.io';
-import { UserSocket, HashMap } from '@auth/authorizeSocket';
+import { UserSocket, SocketMap } from '@auth/authorizeSocket';
 
 export default class SocketEvents {
   constructor(
     public io: Server,
     public socket: UserSocket,
-    public hashmap: HashMap
+    public hashmap: SocketMap
   ) {}
 
   public message(msg: string) {
