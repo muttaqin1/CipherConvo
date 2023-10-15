@@ -9,6 +9,7 @@ import IUser from '@interfaces/models/IUser';
 import Role from '@models/Role';
 import Activity from '@models/Activity';
 
+
 @injectable()
 export default class UserRepository implements IUserRepository {
   constructor(
@@ -16,6 +17,10 @@ export default class UserRepository implements IUserRepository {
     @inject(TYPES.RoleModel) private readonly roleModel: typeof Role,
     @inject(TYPES.ActivityModel) private readonly activityModel: typeof Activity
   ) {}
+
+  public findUsers(): Promise<User[]>{
+    return this.userModel.findAll();
+  }
 
   public async createUser(user: userInput): Promise<userOutput | null> {
     return this.userModel.create(user);
@@ -80,6 +85,27 @@ export default class UserRepository implements IUserRepository {
       where: { id: userId },
       limit: 1
     });
+  }
+
+  public updateUserExceptUsernameEmailAndPassword<T extends Partial<Omit<IUser, 'userName' | 'email' | 'password' >>>(
+    userId: string,
+    data: T
+  ): Promise<[affectedCount: number]>{
+    return this.userModel.update(data,{
+      where: {id: userId},
+      limit: 1
+    })
+  }
+
+  public updateUsername(
+    userId: string,
+    userName: string
+  ): Promise<[affectedCount: number]>{
+    return this.userModel.update({userName: userName},{
+      where: { id: userId},
+      limit: 1
+    }
+    );
   }
 
   public deleteUser(id: string): Promise<number> {
