@@ -7,7 +7,6 @@ import cors from 'cors';
 import compression from 'compression';
 import { IsProduction } from '@config/index';
 import Container from '@ioc/container';
-// import swaggerDocs from '@helpers/swagger';
 import {
   customOrigin,
   globalErrorHandler,
@@ -17,14 +16,41 @@ import {
 } from '@middlewares/index';
 import '@middlewares/notFoundHandler';
 import '@controllers/AuthController';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import * as swagger from 'swagger-express-ts';
+import { join } from 'path';
+import '@apiModels/index';
 
 const server = new InversifyExpressServer(Container, null, {
   rootPath: '/api'
 });
 server.setConfig((app: Application) => {
-  // swaggerDocs(app);
+  app.use('/api-docs/', express.static(join(__dirname, '..', 'public')));
+  app.use('/api-docs/swagger/assets', express.static('node_modules/swagger-ui-dist'));
   app.use('/api', apiLimiter);
   app.use(express.json());
+  app.use(swagger.express(
+    {
+      definition: {
+        info: {
+          title: 'CipherConvo',
+          version: '1.0.0'
+        },
+        basePath: '/api',
+        externalDocs: {
+          url: 'localhost:3000/api-docs/'
+        },
+        securityDefinitions: {
+          basicAuth: {
+            type: swagger.SwaggerDefinitionConstant.Security.Type.API_KEY,
+            in: swagger.SwaggerDefinitionConstant.Security.In.HEADER,
+            name: 'authorization',
+          }
+        }
+
+      }
+    }
+  ));
   app.use((req, _, next) => {
     if (req.method.toUpperCase() !== 'GET' || !IsProduction)
       Logger.debug(req.body);

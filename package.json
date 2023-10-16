@@ -43,6 +43,8 @@
     "morgan": "1.10.0",
     "prettier": "2.8.4",
     "supertest": "6.3.3",
+    "swagger-express-ts": "1.1.0",
+    "swagger-ui-dist": "5.9.0",
     "ts-jest": "29.0.5",
     "ts-node": "10.9.1",
     "ts-node-dev": "2.0.0",
