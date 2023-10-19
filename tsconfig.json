@@ -14,7 +14,7 @@
     "incremental": true,
     "strict": true,
     "moduleResolution": "node",
-    "types": ["reflect-metadata", "jest"],
+    "types": ["reflect-metadata", "jest","swagger-express-ts"],
     "paths": {
       "@helpers/*": ["helpers/*"],
       "@constants/*": ["constants/*"],
@@ -27,7 +27,8 @@
       "@controllers/*": ["api/controllers/*"],
       "@models/*": ["api/models/*"],
       "@services/*": ["api/services/*"],
-      "@repositories/*": ["api/repositories/*"]
+      "@repositories/*": ["api/repositories/*"],
+      "@apiModels/*": ["apiModels/*"]
     },
     "esModuleInterop": true,
     "skipLibCheck": true,
