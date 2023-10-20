@@ -41,10 +41,10 @@ server.setConfig((app: Application) => {
           url: 'localhost:3000/api-docs/'
         },
         securityDefinitions: {
-          basicAuth: {
+          bearerAuth: {
             type: swagger.SwaggerDefinitionConstant.Security.Type.API_KEY,
             in: swagger.SwaggerDefinitionConstant.Security.In.HEADER,
-            name: 'authorization',
+            name: 'authorization'
           }
         }
 
