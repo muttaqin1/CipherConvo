@@ -121,6 +121,7 @@ export default class AuthUtils implements IAuthUtils {
         ...payload,
         refreshTokenKey
       });
+      
       if (!accessToken || !refreshToken) throw new InternalServerError();
       return { accessToken, refreshToken };
     } catch (err) {

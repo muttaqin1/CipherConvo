@@ -70,7 +70,7 @@ export default class AuthController implements IAuthController {
   public async login(
     @request() req: Request,
       @response() res: Response
-  ): Promise<void> {
+  ): Promise<void> {    
     const { userName, email, password } = req.body;
     const responseData = await this.authService.login({
       userName,

@@ -9,7 +9,8 @@ export const ErrorTypes = {
   NOT_FOUND: 'NotFoundError',
   BAD_REQUEST: 'BadRequestError',
   FORBIDDEN: 'ForbiddenError',
-  NO_DATA: 'NoDataError'
+  NO_DATA: 'NoDataError',
+  CONFLICT: 'ConflictError'
 } as const;
 
 export type TErrorType = ExtractObjValueTypes<typeof ErrorTypes>;

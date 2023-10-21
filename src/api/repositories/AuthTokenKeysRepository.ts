@@ -13,18 +13,18 @@ export default class AuthTokenKeysRepository
 {
   constructor(
     @inject(TYPES.AuthTokenKeysModel)
-    private readonly authTokeKeys: typeof AuthTokenKeys
+    private readonly authTokenKeys: typeof AuthTokenKeys
   ) {}
 
   public deleteKeys(userId: string): Promise<number> {
-    return this.authTokeKeys.destroy({ where: { userId } });
+    return this.authTokenKeys.destroy({ where: { userId } });
   }
 
   public async createKeys(
     data: AuthTokenKeysInput
   ): Promise<AuthTokenKeysOutput> {
     try {
-      return await this.authTokeKeys.create(data, {
+      return await this.authTokenKeys.create(data, {
         fields: ['userId', 'accessTokenKey', 'refreshTokenKey']
       });
     } catch (e) {
@@ -37,6 +37,6 @@ export default class AuthTokenKeysRepository
     accessTokenKey?: string;
     refreshTokenKey?: string;
   }): Promise<AuthTokenKeysOutput | null> {
-    return this.authTokeKeys.findOne({ where: data });
+    return this.authTokenKeys.findOne({ where: data });
   }
 }

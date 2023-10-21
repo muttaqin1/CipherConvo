@@ -2,7 +2,7 @@ import { ForbiddenError } from '@helpers/AppError/ApiError';
 import rateLimit from 'express-rate-limit';
 
 export const apiLimiter = rateLimit({
-  windowMs: 1000 * 60 * 10, // 10 munites
+  windowMs: 1000 * 60 * 10, // 10 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   handler: (_req, _res, next) => {
     next(

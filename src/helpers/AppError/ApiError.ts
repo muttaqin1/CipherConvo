@@ -64,3 +64,9 @@ export class NoDataError extends ApiError {
     super(ErrorTypes.NO_DATA, message, errorStatusCodes.NOT_FOUND);
   }
 }
+
+export class ConflictError extends ApiError{
+  constructor(message: string = ErrorMessages.CONFLICT){
+    super(ErrorTypes.CONFLICT, message, errorStatusCodes.CONFLICT);
+  }
+}

@@ -23,6 +23,8 @@ import TwoFactorAuthToken from '@models/TwoFactorAuthToken';
 import ITwoFactorAuthTokenRepository from '@interfaces/repository/ITwoFactorAuthTokenRepository';
 import TwoFactorAuthTokenRepository from '@repositories/TwoFactorAuthTokenRepository';
 import nodeMailer from 'nodemailer';
+import IUserService from '@interfaces/service/IUserService';
+import UserService from '@services/UserService';
 /**
  * @description Container for dependency injection using inversify
  * @export container - Container instance for dependency injection
@@ -69,6 +71,10 @@ container
 container
   .bind<ITwoFactorAuthTokenRepository>(TYPES.TwoFactorAuthTokenRepository)
   .to(TwoFactorAuthTokenRepository)
+  .inSingletonScope();
+container
+  .bind<IUserService>(TYPES.UserService)
+  .to(UserService)
   .inSingletonScope();
 
 // helpers
