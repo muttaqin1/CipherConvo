@@ -20,8 +20,7 @@ import IJsonWebToken from '@interfaces/helpers/IJsonWebToken';
 import { injectable } from 'inversify';
 import JwtPayload from '@interfaces/auth/JwtPayload';
 
-const IsJsonWebTokenError = (err: unknown): err is JsonWebTokenError =>
-  err instanceof JsonWebTokenError;
+const IsJsonWebTokenError = (err: unknown): err is JsonWebTokenError => err instanceof JsonWebTokenError;
 
 @injectable()
 export default class Jwt implements IJsonWebToken {
@@ -75,15 +74,15 @@ export default class Jwt implements IJsonWebToken {
     } catch (err) {
       if (IsJsonWebTokenError(err)) {
         if (
-          err &&
-          err instanceof TokenExpiredError &&
-          err.name === 'TokenExpiredError'
+          err
+          && err instanceof TokenExpiredError
+          && err.name === 'TokenExpiredError'
         )
           throw new _TokenExpiredError();
         else if (
-          err &&
-          err instanceof NotBeforeError &&
-          err.name === 'NotBeforeError'
+          err
+          && err instanceof NotBeforeError
+          && err.name === 'NotBeforeError'
         ) {
           throw new ForbiddenError();
         } else throw new BadTokenError();
