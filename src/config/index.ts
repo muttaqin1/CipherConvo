@@ -2,10 +2,6 @@ import { join } from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: join(__dirname, '../../.env') });
-
-console.log(process.env.DATABASE_USER);
-console.log(process.env.DATABASE_PASSWORD);
-
 export const port = Number(process.env.PORT) || 3000;
 export const environment = process.env.NODE_ENV || 'DEVELOPMENT';
 export const IsProduction = (): boolean => environment.toUpperCase() === 'PRODUCTION';

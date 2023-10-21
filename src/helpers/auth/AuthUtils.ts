@@ -139,7 +139,6 @@ export default class AuthUtils implements IAuthUtils {
       if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
       return payload;
     } catch (err) {
-      console.log(err);
       if (err instanceof BadTokenError || err instanceof TokenExpiredError)
         throw new AccessTokenError();
       else throw err;

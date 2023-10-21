@@ -46,7 +46,6 @@ export class UserController implements interfaces.Controller {
     @request() req: Request,
     @response() res: express.Response
   ) {
-    console.log('HEY');
     const users = await this.userRepository.findUsers();
     new ApiSuccessResponse(res)
       .status(SuccessResponseCodes.SUCCESS)
@@ -138,9 +137,7 @@ export class UserController implements interfaces.Controller {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       gender: req.body.gender
-    };
-    console.log(updatableUser);
-    
+    };  
     await this.userRepository.updateUser(userId, updatableUser);
     new ApiSuccessResponse(res).status(SuccessResponseCodes.ACCEPTED).send({
       message: `User with id ${userId} has been updated successfully.`

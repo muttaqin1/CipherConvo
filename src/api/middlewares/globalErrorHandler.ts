@@ -12,7 +12,6 @@ export const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  console.log(err);
   if (res.headersSent) return next(err);
   if (IsApiError(err)) return new ApiErrorResponse(res).send(err);
   if (!IsProduction()) {
