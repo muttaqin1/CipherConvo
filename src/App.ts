@@ -16,6 +16,7 @@ import {
 } from '@middlewares/index';
 import '@middlewares/notFoundHandler';
 import '@controllers/AuthController';
+import '@controllers/UserController';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as swagger from 'swagger-express-ts';
 import { join } from 'path';

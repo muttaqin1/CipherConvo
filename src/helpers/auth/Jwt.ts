@@ -68,10 +68,11 @@ export default class Jwt implements IJsonWebToken {
   public async verifyToken(token: string): Promise<JwtPayload> {
     try {
       const publicKey = await this.readPublicKey('utf8');
-      if (!publicKey) throw new InternalServerError();
+      if (!publicKey) throw new InternalServerError();      
       // @ts-ignore
       return (await promisify(verify)(token, publicKey)) as JwtPayload;
     } catch (err) {
+      // console.log(err);      
       if (IsJsonWebTokenError(err)) {
         if (
           err

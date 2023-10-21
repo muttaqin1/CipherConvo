@@ -5,8 +5,16 @@ export const MockFindUserByEmail = jest.fn();
 export const MockFindByUsername = jest.fn();
 export const MockUpdateUser = jest.fn();
 export const MockDeleteUser = jest.fn();
+export const MockFindUsers = jest.fn();
+export const MockUpdateUsername = jest.fn();
 
 export default class MockUserRepository implements IUserRepository {
+  public findUsers(){
+    return MockFindUsers();
+  }
+  public updateUsername(userId: string, userName: string) {
+    return MockUpdateUsername(userId, userName);
+  }
   public createUser(user: any) {
     return MockCreateUser(user);
   }

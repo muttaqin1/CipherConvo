@@ -65,7 +65,7 @@ export default class EmailService implements IEmailService {
   }
 
   public async sendAccountVerificationEmail(email: string): Promise<void> {
-    try {
+    try {      
       const user = await this.userRepository.findUserByEmail(email, {
         activity: true
       });

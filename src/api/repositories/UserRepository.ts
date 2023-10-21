@@ -86,17 +86,7 @@ export default class UserRepository implements IUserRepository {
       limit: 1
     });
   }
-
-  public updateUserExceptUsernameEmailAndPassword<T extends Partial<Omit<IUser, 'userName' | 'email' | 'password' >>>(
-    userId: string,
-    data: T
-  ): Promise<[affectedCount: number]>{
-    return this.userModel.update(data,{
-      where: {id: userId},
-      limit: 1
-    })
-  }
-
+  
   public updateUsername(
     userId: string,
     userName: string

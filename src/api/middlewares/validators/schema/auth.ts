@@ -35,3 +35,11 @@ export const emailSchema = Joi.object({
 export const tokenSchema = Joi.object({
   token: Joi.string().required()
 });
+export const usernameSchema = Joi.object({
+  userName: Joi.string().required()
+})
+export const updateSchema = Joi.object({
+  firstName: Joi.string(),
+  lastName: Joi.string(),
+  gender: Joi.string(),
+}).or('firstName', 'lastName', 'gender')
