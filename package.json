@@ -1,5 +1,5 @@
 {
-  "name": "cypherconv",
+  "name": "cypherconvo",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "repository": "git@github.com:muttaqin1/CypherConv.git",
@@ -43,7 +43,6 @@
     "morgan": "1.10.0",
     "prettier": "2.8.4",
     "supertest": "6.3.3",
-    "swagger-express-ts": "1.1.0",
     "swagger-ui-dist": "5.9.0",
     "ts-jest": "29.0.5",
     "ts-node": "10.9.1",
@@ -58,11 +57,12 @@
     "compression": "1.7.4",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
+    "deps": "^1.0.0",
     "dotenv": "16.0.3",
     "express": "4.18.2",
     "express-rate-limit": "6.7.0",
     "helmet": "6.0.1",
-    "inversify": "6.0.1",
+    "inversify": "^6.0.2",
     "inversify-express-utils": "6.4.3",
     "joi": "17.8.3",
     "joi-password-complexity": "5.1.0",
@@ -72,9 +72,10 @@
     "multer": "1.4.5-lts.1",
     "mysql2": "3.1.2",
     "nodemailer": "6.9.1",
-    "reflect-metadata": "0.1.13",
+    "reflect-metadata": "^0.1.13",
     "sequelize": "6.29.0",
     "socket.io": "4.6.1",
+    "swagger-express-ts": "^1.1.0",
     "swagger-ui-express": "4.6.3",
     "uuid": "9.0.0",
     "winston": "3.8.2",
@@ -84,5 +85,13 @@
   "lint-staged": {
     "*.+(ts)": "eslint --fix",
     "*.+(ts|json|md)": "prettier --config .prettierrc --write ."
+  },
+  "overrides": {
+    "swagger-express-ts": {
+      "@types/compression": "1.7.2",
+      "helmet": "6.0.1",
+      "inversify": "^6.0.2",
+      "inversify-express-utils": "6.4.3"
+    }
   }
 }
