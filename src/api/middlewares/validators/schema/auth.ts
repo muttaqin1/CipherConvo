@@ -37,9 +37,9 @@ export const tokenSchema = Joi.object({
 });
 export const usernameSchema = Joi.object({
   userName: Joi.string().required()
-})
+});
 export const updateSchema = Joi.object({
   firstName: Joi.string(),
   lastName: Joi.string(),
-  gender: Joi.string(),
-}).or('firstName', 'lastName', 'gender')
+  gender: Joi.string()
+}).or('firstName', 'lastName', 'gender');

@@ -28,11 +28,14 @@ const server = new InversifyExpressServer(Container, null, {
 });
 server.setConfig((app: Application) => {
   app.use('/api-docs/', express.static(join(__dirname, '..', 'public')));
-  app.use('/api-docs/swagger/assets', express.static('node_modules/swagger-ui-dist'));
+  app.use(
+    '/api-docs/swagger/assets',
+    express.static('node_modules/swagger-ui-dist')
+  );
   app.use('/api', apiLimiter);
   app.use(express.json());
-  app.use(swagger.express(
-    {
+  app.use(
+    swagger.express({
       definition: {
         info: {
           title: 'CipherConvo',
@@ -56,8 +59,8 @@ server.setConfig((app: Application) => {
           ...AllModels
         }
       }
-    }
-  ));
+    })
+  );
 
   app.use((req, _, next) => {
     if (req.method.toUpperCase() !== 'GET' || !IsProduction)

@@ -32,7 +32,12 @@ import IEmailService from '@interfaces/service/IEmailService';
 import { SuccessResponseCodes } from '@helpers/ApiResponse/BaseResponse';
 import {
   // eslint-disable-next-line max-len
-  ApiPath, ApiOperationPost, ApiOperationDelete, SwaggerDefinitionConstant, ApiOperationPut, ApiOperationGet,
+  ApiPath,
+  ApiOperationPost,
+  ApiOperationDelete,
+  SwaggerDefinitionConstant,
+  ApiOperationPut,
+  ApiOperationGet
 } from 'swagger-express-ts';
 
 @ApiPath({
@@ -40,8 +45,7 @@ import {
   name: 'Auth Route',
   security: {
     bearerAuth: []
-  },
-
+  }
 })
 @controller('/v1/auth')
 export default class AuthController implements IAuthController {
@@ -58,19 +62,18 @@ export default class AuthController implements IAuthController {
         description: 'Login credentials.',
         required: true,
         model: 'LoginDto'
-      },
+      }
     },
-    security: {
-    },
+    security: {},
     responses: {
       200: { description: 'SUCCESS', model: 'LoginResponse' }
-    },
+    }
   })
   @httpPost('/login', validate(loginSchema))
   public async login(
     @request() req: Request,
-      @response() res: Response
-  ): Promise<void> {    
+    @response() res: Response
+  ): Promise<void> {
     const { userName, email, password } = req.body;
     const responseData = await this.authService.login({
       userName,
@@ -88,19 +91,16 @@ export default class AuthController implements IAuthController {
         description: 'Signup data',
         required: true,
         model: 'SignupDto'
-      },
+      }
     },
-    security: {
-    },
+    security: {},
     responses: {
       201: { description: 'CREATED', model: 'SignupResponse' }
-    },
+    }
   })
   @httpPost('/signup', signupLimiter, validate(signupSchema))
   public async signup(@request() req: Request, @response() res: Response) {
-    const {
-      userName, firstName, lastName, email, password, gender
-    } = req.body;
+    const { userName, firstName, lastName, email, password, gender } = req.body;
 
     const responseData = await this.authService.signup({
       userName,
@@ -118,8 +118,7 @@ export default class AuthController implements IAuthController {
   @ApiOperationDelete({
     path: '/logout',
     description: 'User can log out from their account.',
-    parameters: {
-    },
+    parameters: {},
     responses: {
       204: {
         description: 'No Content',
@@ -130,7 +129,7 @@ export default class AuthController implements IAuthController {
   @httpDelete('/logout', deserializeUser)
   public async logout(
     @request() req: Request,
-      @response() res: Response
+    @response() res: Response
   ): Promise<void> {
     await this.authService.logout(req.user);
     new ApiSuccessResponse(res)
@@ -155,14 +154,10 @@ export default class AuthController implements IAuthController {
       }
     }
   })
-  @httpPut(
-    '/token-refresh',
-    deserializeUser,
-    validate(tokenRefreshSchema)
-  )
+  @httpPut('/token-refresh', deserializeUser, validate(tokenRefreshSchema))
   public async tokenRefresh(
     @request() req: Request,
-      @response() res: Response
+    @response() res: Response
   ): Promise<void> {
     const responseData = await this.authService.refreshTokens(req);
     new ApiSuccessResponse(res)
@@ -172,7 +167,8 @@ export default class AuthController implements IAuthController {
 
   @ApiOperationPost({
     path: '/verify-account',
-    description: 'User gets an verfication email. User can verify their account using their gmail account.',
+    description:
+      'User gets an verfication email. User can verify their account using their gmail account.',
     parameters: {
       body: {
         description: 'Verify account params.',
@@ -188,7 +184,7 @@ export default class AuthController implements IAuthController {
   })
   @httpPost('/verify-account', validate(emailSchema))
   public async verifyAccount(
-  @request() req: Request,
+    @request() req: Request,
     @response() res: Response
   ) {
     const { email } = req.body;
@@ -200,7 +196,8 @@ export default class AuthController implements IAuthController {
 
   @ApiOperationPost({
     path: '/verify-email',
-    description: 'User gets an verfication email. User can verify their gmail using their gmail account.',
+    description:
+      'User gets an verfication email. User can verify their gmail using their gmail account.',
     parameters: {
       body: {
         description: 'Verify email params.',
@@ -225,7 +222,8 @@ export default class AuthController implements IAuthController {
 
   @ApiOperationPost({
     path: '/forgot-password',
-    description: 'User gets a verification email. User can reset their password using their gmail account',
+    description:
+      'User gets a verification email. User can reset their password using their gmail account',
     parameters: {
       body: {
         description: 'Forgot password params.',
@@ -241,7 +239,7 @@ export default class AuthController implements IAuthController {
   })
   @httpPost('/forgot-password', validate(emailSchema))
   public async forgotPassword(
-  @request() req: Request,
+    @request() req: Request,
     @response() res: Response
   ) {
     const { email } = req.body;
@@ -267,7 +265,7 @@ export default class AuthController implements IAuthController {
   })
   @httpGet('/verify-verification-token/:token', validateParams(tokenSchema))
   public async verifyVerificationToken(
-  @request() req: Request,
+    @request() req: Request,
     @response() res: Response
   ) {
     const { token } = req.params;
@@ -294,14 +292,13 @@ export default class AuthController implements IAuthController {
     },
     responses: {
       204: {
-        description: 'NO_CONTENT',
+        description: 'NO_CONTENT'
       }
     }
   })
-
   @httpPut('/reset-password/:token', validateParams(tokenSchema))
   public async resetPassword(
-  @request() req: Request,
+    @request() req: Request,
     @response() res: Response
   ) {
     const { token } = req.params;
@@ -314,7 +311,8 @@ export default class AuthController implements IAuthController {
 
   @ApiOperationPut({
     path: '/change-password',
-    description: 'User can change their password by providing their old password.',
+    description:
+      'User can change their password by providing their old password.',
     parameters: {
       body: {
         description: 'New password.',
@@ -324,14 +322,13 @@ export default class AuthController implements IAuthController {
     },
     responses: {
       204: {
-        description: 'NO_CONTENT',
+        description: 'NO_CONTENT'
       }
     }
   })
-
   @httpPut('/change-password', deserializeUser)
   public async changePassword(
-  @request() req: Request,
+    @request() req: Request,
     @response() res: Response
   ) {
     const { oldPassword, newPassword } = req.body;

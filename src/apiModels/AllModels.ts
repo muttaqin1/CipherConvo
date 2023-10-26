@@ -112,6 +112,36 @@ export default {
     }
   },
 
+  // UserController DTO Models
+  UpdateUsernameDto: {
+    description: "Update username",
+    properties: {
+      userName: {
+        description: "New Username",
+        required: true,
+        type: SwaggerDefinitionConstant.Model.Property.Type.STRING     
+      }
+    }
+  },
+  UpdateUserDTO: {
+    description: "Update User Credentials DTO",
+    properties: {
+      firstName: {
+        description: "First name of the user",
+        type: SwaggerDefinitionConstant.Model.Property.Type.STRING
+      },
+      lastName: {
+        description: "Last name of the user",
+        type: SwaggerDefinitionConstant.Model.Property.Type.STRING
+      },
+      gender: {
+        description: "Gender Of the user",
+        type: SwaggerDefinitionConstant.Model.Property.Type.STRING,
+        enum: ['male','female']
+      },
+    }
+  },
+
   // AuthController Response Models
   LoginResponse: {
     description: 'Login Response.',
@@ -184,15 +214,15 @@ export default {
         required: true,
         type: SwaggerDefinitionConstant.Model.Property.Type.STRING
       },
-      email: {
-        description: 'Email of the user.',
-        required: true,
-        type: SwaggerDefinitionConstant.Model.Property.Type.STRING
-      },
       gender: {
         description: 'Gender of the user.',
         required: true,
         enum: ['male', 'female'],
+        type: SwaggerDefinitionConstant.Model.Property.Type.STRING
+      },
+      email: {
+        description: 'Email of the user.',
+        required: true,
         type: SwaggerDefinitionConstant.Model.Property.Type.STRING
       },
       password: {
