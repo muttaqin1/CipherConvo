@@ -20,24 +20,30 @@ import '@controllers/UserController';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as swagger from 'swagger-express-ts';
 import { join } from 'path';
-import '@apiModels/index';
+// import '@apiModels/index';
+import AllModels from '@apiModels/AllModels';
 
 const server = new InversifyExpressServer(Container, null, {
   rootPath: '/api'
 });
 server.setConfig((app: Application) => {
   app.use('/api-docs/', express.static(join(__dirname, '..', 'public')));
-  app.use('/api-docs/swagger/assets', express.static('node_modules/swagger-ui-dist'));
+  app.use(
+    '/api-docs/swagger/assets',
+    express.static('node_modules/swagger-ui-dist')
+  );
   app.use('/api', apiLimiter);
   app.use(express.json());
-  app.use(swagger.express(
-    {
+  app.use(
+    swagger.express({
       definition: {
         info: {
           title: 'CipherConvo',
           version: '1.0.0'
         },
+        host: 'localhost:3000',
         basePath: '/api',
+        schemes: ['http'],
         externalDocs: {
           url: 'localhost:3000/api-docs/'
         },
@@ -45,13 +51,17 @@ server.setConfig((app: Application) => {
           bearerAuth: {
             type: swagger.SwaggerDefinitionConstant.Security.Type.API_KEY,
             in: swagger.SwaggerDefinitionConstant.Security.In.HEADER,
-            name: 'authorization'
+            name: 'Authorization'
           }
+        },
+        models: {
+          // Define your models here
+          ...AllModels
         }
-
       }
-    }
-  ));
+    })
+  );
+
   app.use((req, _, next) => {
     if (req.method.toUpperCase() !== 'GET' || !IsProduction)
       Logger.debug(req.body);

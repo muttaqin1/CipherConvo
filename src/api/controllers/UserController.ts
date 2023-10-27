@@ -27,7 +27,22 @@ import {
   usernameSchema
 } from '@middlewares/validators/schema/auth';
 import UserService from '@services/UserService';
+import {
+  // eslint-disable-next-line max-len
+  ApiPath,
+  ApiOperationGet,
+  SwaggerDefinitionConstant,
+  ApiOperationPut,
+  ApiOperationDelete
+} from 'swagger-express-ts';
 
+@ApiPath({
+  path: '/v1/user',
+  name: 'User Route',
+  security: {
+    bearerAuth: []
+  }
+})
 @controller('/v1/user')
 export class UserController implements interfaces.Controller {
   constructor(
@@ -40,6 +55,18 @@ export class UserController implements interfaces.Controller {
     @inject(TYPES.UserService) private readonly userService: UserService
   ) {}
 
+  @ApiOperationGet({
+    path: '/',
+    description: 'User can get all the users',
+    security: {},
+    responses: {
+      200: {
+        description: 'SUCCESS',
+        model: 'UserModel',
+        type: SwaggerDefinitionConstant.ARRAY
+      }
+    }
+  })
   // Get all users
   @httpGet('/')
   public async getUsers(
@@ -52,6 +79,23 @@ export class UserController implements interfaces.Controller {
       .send(users);
   }
 
+  @ApiOperationGet({
+    path: '/{userId}',
+    description: 'User can get their credentials',
+    security: {},
+    parameters: {
+      path: {
+        userId: {
+          required: true,
+          type: SwaggerDefinitionConstant.STRING,
+          description: 'User Id'
+        }
+      }
+    },
+    responses: {
+      201: { description: 'SUCCESSFUL', model: 'UserModel' }
+    }
+  })
   // Get user by id
   @httpGet('/:id')
   public async getUser(
@@ -69,6 +113,21 @@ export class UserController implements interfaces.Controller {
         );
   }
 
+  @ApiOperationPut({
+    path: '/update-username',
+    description: 'User can update their username',
+    parameters: {
+      body: {
+        description: 'New Username',
+        required: true,
+        type: SwaggerDefinitionConstant.STRING,
+        model: 'UpdateUsernameDto'
+      }
+    },
+    responses: {
+      202: { description: 'ACCEPTED' }
+    }
+  })
   // update username by id
   @httpPut('/update-username', deserializeUser, validate(usernameSchema))
   public async changeUsername(
@@ -82,6 +141,15 @@ export class UserController implements interfaces.Controller {
     });
   }
 
+  @ApiOperationDelete({
+    path: '/delete-account',
+    description:
+      'Upon submitting a request to delete their account, User will receive an email confirming their request and providing a link to click to permanently delete their account.',
+    parameters: {},
+    responses: {
+      201: { description: 'ACCEPTED' }
+    }
+  })
   // Send a verification email to user
   @httpDelete('/delete-account', deserializeUser)
   public async removeAccount(
@@ -95,6 +163,24 @@ export class UserController implements interfaces.Controller {
     });
   }
 
+  @ApiOperationGet({
+    path: '/verify-account-deletion/{token}',
+    description:
+      'Users can delete their account by clicking on the link in the email that they receive after requesting to delete their account',
+    parameters: {
+      path: {
+        token: {
+          description: 'Verification Token',
+          required: true,
+          type: SwaggerDefinitionConstant.STRING
+        }
+      }
+    },
+    security: {},
+    responses: {
+      202: { description: 'ACCEPTED' }
+    }
+  })
   // Verify and delete user by token
   @httpGet('/verify-account-deletion/:token')
   public async verifyAndRemoveAccount(
@@ -126,6 +212,20 @@ export class UserController implements interfaces.Controller {
     }
   }
 
+  @ApiOperationPut({
+    path: '/update',
+    description: 'User can update their credentials',
+    parameters: {
+      body: {
+        description: 'Updated Credentials',
+        required: true,
+        model: 'UpdateUserDTO'
+      }
+    },
+    responses: {
+      202: { description: 'ACCEPTED' }
+    }
+  })
   // Update User except username, email and password
   @httpPut('/update', deserializeUser, validate(updateSchema))
   public async changeUserDetails(
@@ -137,7 +237,7 @@ export class UserController implements interfaces.Controller {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       gender: req.body.gender
-    };  
+    };
     await this.userRepository.updateUser(userId, updatableUser);
     new ApiSuccessResponse(res).status(SuccessResponseCodes.ACCEPTED).send({
       message: `User with id ${userId} has been updated successfully.`
