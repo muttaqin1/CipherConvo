@@ -7,7 +7,12 @@ import {
   ForbiddenError,
   InternalServerError
 } from '@helpers/AppError/ApiError';
-import { JWT, passwordHashSaltRound } from '@config/index';
+import {
+  JWT,
+  accessTokenSecret,
+  passwordHashSaltRound,
+  refreshTokenSecret
+} from '@config/index';
 import IAuthUtils from '@interfaces/helpers/IAuthUtils';
 import { inject, injectable } from 'inversify';
 import IJsonWebToken from '@interfaces/helpers/IJsonWebToken';
@@ -41,10 +46,9 @@ export default class AuthUtils implements IAuthUtils {
   ): Promise<boolean> {
     const [password, salt] = databaseSavedPassword.split(':');
     if (!salt || !password) throw new InternalServerError();
-    const genPassWithEnteredPassAndDbSavedPassSalt =
-      await this.generatePassword(enteredPassword, salt);
-    const generatedPassword =
-      genPassWithEnteredPassAndDbSavedPassSalt.split(':')[0];
+    // @ts-ignore
+    const genPass = await this.generatePassword(enteredPassword, salt);
+    const generatedPassword = genPass?.split(':')[0];
     return generatedPassword === password;
   }
 
@@ -70,34 +74,40 @@ export default class AuthUtils implements IAuthUtils {
 
   private async generateAccessToken<
     T extends Pick<
-      JwtPayload,
-      'userId' | 'roleId' | 'email' | 'userName' | 'accessTokenKey'
+    JwtPayload,
+    'userId' | 'roleId' | 'email' | 'userName' | 'accessTokenKey'
     >
   >(payload: Required<T>): Promise<string> {
-    return this.jwt.generateToken({
-      iss: JWT.iss,
-      iat: Math.floor(Date.now() / 1000),
-      sub: JWT.sub,
-      aud: JWT.aud,
-      exp: JWT.accessTokenExpiry,
-      ...payload
-    });
+    return this.jwt.generateToken(
+      {
+        iss: JWT.iss,
+        iat: Math.floor(Date.now() / 1000),
+        sub: JWT.sub,
+        aud: JWT.aud,
+        exp: JWT.accessTokenExpiry,
+        ...payload
+      },
+      accessTokenSecret
+    );
   }
 
   private async generateRefreshToken<
     T extends Pick<
-      JwtPayload,
-      'userId' | 'roleId' | 'email' | 'userName' | 'refreshTokenKey'
+    JwtPayload,
+    'userId' | 'roleId' | 'email' | 'userName' | 'refreshTokenKey'
     >
   >(payload: Required<T>): Promise<string> {
-    return this.jwt.generateToken({
-      iss: JWT.iss,
-      iat: Math.floor(Date.now() / 1000),
-      sub: JWT.sub,
-      aud: JWT.aud,
-      exp: JWT.refreshTokenExpiry,
-      ...payload
-    });
+    return this.jwt.generateToken(
+      {
+        iss: JWT.iss,
+        iat: Math.floor(Date.now() / 1000),
+        sub: JWT.sub,
+        aud: JWT.aud,
+        exp: JWT.refreshTokenExpiry,
+        ...payload
+      },
+      refreshTokenSecret
+    );
   }
 
   public async generateTokens(
@@ -121,7 +131,7 @@ export default class AuthUtils implements IAuthUtils {
         ...payload,
         refreshTokenKey
       });
-      
+
       if (!accessToken || !refreshToken) throw new InternalServerError();
       return { accessToken, refreshToken };
     } catch (err) {
@@ -130,11 +140,21 @@ export default class AuthUtils implements IAuthUtils {
     }
   }
 
-  public async verifyAccessToken(req: Request): Promise<JwtPayload> {
+  public async verifyAccessToken(
+    req: Request | null,
+    socket?: boolean,
+    accessToken?: string
+  ): Promise<JwtPayload> {
     try {
-      const token = this.sanitizeAuthHeader(req);
-      if (!token) throw new AuthFailureError();
-      const payload = await this.jwt.verifyToken(token);
+      let token;
+      if (req && !socket && !accessToken) {
+        token = this.sanitizeAuthHeader(req);
+        if (!token) throw new AuthFailureError();
+      } else {
+        token = accessToken;
+        if (!token) throw new AuthFailureError();
+      }
+      const payload = await this.jwt.verifyToken(token, accessTokenSecret);
       if (!payload) throw new AuthFailureError();
       if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
       return payload;
@@ -149,7 +169,7 @@ export default class AuthUtils implements IAuthUtils {
     try {
       const token = this.sanitizeAuthHeader(req);
       if (!token) throw new AuthFailureError();
-      const payload = await this.jwt.decodeToken(token);
+      const payload = await this.jwt.decodeToken(token, accessTokenSecret);
       if (!payload) throw new AuthFailureError();
       if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
       return payload;
@@ -161,22 +181,12 @@ export default class AuthUtils implements IAuthUtils {
 
   public async verifyRefreshToken(refreshToken: string): Promise<JwtPayload> {
     if (!refreshToken) throw new AuthFailureError();
-    const payload = await this.jwt.verifyToken(refreshToken);
+    const payload = await this.jwt.verifyToken(
+      refreshToken,
+      refreshTokenSecret
+    );
     if (!payload) throw new AuthFailureError();
     if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
     return payload;
-  }
-
-  public async verifySocketAccessToken(token: string): Promise<JwtPayload> {
-    try {
-      const payload = await this.jwt.verifyToken(token);
-      if (!payload) throw new AuthFailureError();
-      if (!this.verifyJwtPayload(payload)) throw new AuthFailureError();
-      return payload;
-    } catch (err) {
-      if (err instanceof BadTokenError || err instanceof TokenExpiredError)
-        throw new AccessTokenError();
-      else throw err;
-    }
   }
 }
