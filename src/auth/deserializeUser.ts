@@ -19,7 +19,7 @@ export const deserializeUser = async (
     );
     const userRepository = container.get<IUserRepository>(TYPES.UserRepository);
     // Verify access token
-    const payload = await authUtils.verifyAccessToken(req);
+    const payload = await authUtils.verifyAccessToken(req, undefined, undefined);
     // Find user
     const user = await userRepository.findUserById(payload.userId, {
       role: true,

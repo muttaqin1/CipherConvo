@@ -87,9 +87,8 @@ export default class AuthService implements IAuthService {
         });
         // Remove the user's auth token keys.
         await this.authTokenKeysRepo.deleteKeys(user.id);
-      }
+      } else
       // Increment failed login count by 1.
-      else
         await this.activityRepo.updateActivity(user.id, {
           failedLoginAttempts: user.activities.failedLoginAttempts + 1
         });
@@ -107,7 +106,6 @@ export default class AuthService implements IAuthService {
     // check if the keys are already stored in database if stored delete them.
     const exists = await this.authTokenKeysRepo.findKeys({ userId: user.id });
     if (exists) await this.authTokenKeysRepo.deleteKeys(user.id);
-    // store the keys in database. this keys are used to verify the tokens. this keys will be stored in tokens. so when we want to validate the token we will match the keys with the database stored keys.
     const keys = await this.authTokenKeysRepo.createKeys({
       userId: user.id,
       accessTokenKey,
@@ -210,8 +208,8 @@ export default class AuthService implements IAuthService {
       refreshToken
     );
     if (
-      accessTokenPayload.id !== refreshTokenPayload.id ||
-      accessTokenPayload.sub !== refreshTokenPayload.sub
+      accessTokenPayload.id !== refreshTokenPayload.id
+      || accessTokenPayload.sub !== refreshTokenPayload.sub
     )
       throw new AuthFailureError('Invalid Token');
     // check if the keys are already stored in database if stored delete them.
@@ -254,13 +252,13 @@ export default class AuthService implements IAuthService {
     if (!user) throw new BadRequestError('Invalid Token');
     if (!user.activities) throw new ForbiddenError();
     if (
-      tokenData.tokenType === TokenType.VERIFY_ACCOUNT &&
-      !user.activities.accessRestricted
+      tokenData.tokenType === TokenType.VERIFY_ACCOUNT
+      && !user.activities.accessRestricted
     )
       throw new BadRequestError('Account is not restricted');
     if (
-      user.activities.emailVerified &&
-      tokenData.tokenType === TokenType.VERIFY_EMAIL
+      user.activities.emailVerified
+      && tokenData.tokenType === TokenType.VERIFY_EMAIL
     )
       throw new BadRequestError('Email already verified');
     if (tokenData.tokenType === TokenType.VERIFY_EMAIL) {

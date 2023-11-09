@@ -25,7 +25,9 @@ export const authorizeSocket = (socketMap: SocketMap) => (async (
     );
     if (!socket.handshake.auth.token) throw new ForbiddenError();
     // Verify access token
-    const payload = await authUtils.verifySocketAccessToken(
+    const payload = await authUtils.verifyAccessToken(
+      null,
+      true,
       socket.handshake.auth.token
     );
       // Find user
