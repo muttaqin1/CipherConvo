@@ -3,7 +3,8 @@ import {
   databaseName,
   databasePassword,
   databaseUser,
-  databasePort
+  databasePort,
+  databaseHostname
 } from '.';
 
 export default {
@@ -12,6 +13,7 @@ export default {
   DIALECT: dialect, // database dialect (mysql, postgres, sqlite, mssql)
   PORT: databasePort,
   database: databaseName, // database name
+  host: databaseHostname, // hostname
   // pool configuration used to pool database connections
   pool: {
     max: 5, // maximum number of connection in pool

@@ -1,0 +1,9 @@
+# FROM mhart/alpine-node AS base
+FROM node:20-alpine
+WORKDIR /usr/src/app
+COPY package.json .
+RUN npm install
+# FROM base AS development
+
+COPY . .
+CMD [ "npm","run","dev"]
