@@ -5,11 +5,14 @@ dotenv.config({ path: join(__dirname, '..', '..', '.env') });
 
 export const port = Number(process.env.PORT) || 3000;
 export const environment = process.env.NODE_ENV || 'DEVELOPMENT';
-export const IsProduction = (): boolean => environment.toUpperCase() === 'PRODUCTION';
+export const IsProduction = (): boolean =>
+  environment.toUpperCase() === 'PRODUCTION';
 export const logFilePath = join(__dirname, '../../logs');
-export const passwordHashSaltRound = Number(process.env.PASSWORD_HASH_SALT_ROUND) || 11;
+export const passwordHashSaltRound =
+  Number(process.env.PASSWORD_HASH_SALT_ROUND) || 11;
 export const databaseUser = process.env.DATABASE_USER || 'root';
 export const databasePort = Number(process.env.DATABASE_PORT) || 3306;
+export const databaseHostname = process.env.DATABASE_HOSTNAME || 'localhost';
 export const databasePassword = process.env.DATABASE_PASSWORD || '';
 export const dialect = process.env.DATABASE_DIALECT || 'mysql';
 export const databaseName = process.env.DATABASE_NAME || 'chat_application';
@@ -31,5 +34,7 @@ export const clientURL = process.env.CLIENT_URL || 'http://localhost:3000';
 export const twoFactorAuthTokenExpiry = new Date(
   Date.now() + 5 * 60 * 60 * 1000
 );
-export const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'adefkokfeda';
-export const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || 'adefkokfeda';
+export const accessTokenSecret =
+  process.env.ACCESS_TOKEN_SECRET || 'adefkokfeda';
+export const refreshTokenSecret =
+  process.env.REFRESH_TOKEN_SECRET || 'adefkokfeda';

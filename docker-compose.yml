@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - '3306:3306'
+    volumes:
+      - cipher_convo_data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=chat_application
+      - MYSQL_ROOT_PASSWORD=test_password
+  app:
+    container_name: cipher-convo-backend
+    build:
+      context: ./
+      dockerfile: DockerFile
+      # target: development
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_HOSTNAME=mysql
+      - DATABASE_PASSWORD=test_password
+    depends_on:
+      - mysql
+
+volumes:
+  cipher_convo_data:
