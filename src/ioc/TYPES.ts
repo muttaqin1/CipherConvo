@@ -1,6 +1,7 @@
 const TYPES = {
   UserModel: Symbol('UserModel'),
   RoleModel: Symbol('RoleModel'),
+  NotificationModel: Symbol('NotificationModel'),
   AuthTokenKeysModel: Symbol('AuthTokenKeys'),
   ActivityModel: Symbol('ActivityModel'),
   UserRepository: Symbol('UserRepository'),

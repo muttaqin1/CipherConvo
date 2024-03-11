@@ -7,16 +7,15 @@ import Activity from '@models/Activity';
 import { injectable } from 'inversify';
 
 export type userInput = Optional<
-  IUser,
-  'id' | 'createdAt' | 'updatedAt' | 'avatar'
+IUser,
+'id' | 'createdAt' | 'updatedAt' | 'avatar'
 >;
 export type userOutput = Required<IUser>;
 
 @injectable()
 export default class User
   extends Model<userOutput, userInput>
-  implements IUser
-{
+  implements IUser {
   public id!: string;
 
   public userName!: string;

@@ -25,6 +25,7 @@ import TwoFactorAuthTokenRepository from '@repositories/TwoFactorAuthTokenReposi
 import nodeMailer from 'nodemailer';
 import IUserService from '@interfaces/service/IUserService';
 import UserService from '@services/UserService';
+import Notification from '@models/Notification';
 /**
  * @description Container for dependency injection using inversify
  * @export container - Container instance for dependency injection
@@ -41,6 +42,7 @@ container
   .bind<typeof TwoFactorAuthToken>(TYPES.TwoFactorAuthToken)
   .toConstantValue(TwoFactorAuthToken);
 
+container.bind<typeof Notification>(TYPES.NotificationModel).toConstantValue(Notification);
 // repositories
 container
   .bind<IUserRepository>(TYPES.UserRepository)

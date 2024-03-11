@@ -10,16 +10,15 @@ import { sequelize } from '@database/index';
 import User from './User';
 
 type notification_input = Optional<
-  INotification,
-  'createdAt' | 'updatedAt' | 'id'
+INotification,
+'createdAt' | 'updatedAt' | 'id'
 >;
 type notification_output = Required<INotification>;
 
 @injectable()
 export default class Notification
   extends Model<notification_input, notification_output>
-  implements INotification
-{
+  implements INotification {
   public id!: string;
 
   public type!: NotificationType;
@@ -57,12 +56,12 @@ Notification.init(
       defaultValue: false
     },
     sender_id: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: DataTypes.UUID,
+      allowNull: false,
     },
     reciever_id: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: DataTypes.UUID,
+      allowNull: false,
     },
     title: {
       type: DataTypes.STRING,
@@ -82,11 +81,11 @@ Notification.init(
   }
 );
 
-Notification.hasOne(User, {
-  foreignKey: 'sender_id',
-  as: 'sender'
-});
-Notification.hasOne(User, {
+Notification.belongsTo(User, {
   foreignKey: 'reciever_id',
   as: 'reciever'
+});
+Notification.belongsTo(User, {
+  foreignKey: 'sender_id',
+  as: 'sender'
 });
