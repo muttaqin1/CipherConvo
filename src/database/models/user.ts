@@ -1,16 +1,32 @@
-import { Model, DataTypes, Optional } from 'sequelize';
-import { sequelize } from '@database/index';
+import { userInput, userOutput } from '@models/User';
+// const { Model } = require('sequelize');
+// module.exports = (sequelize, DataTypes) => {
+// class User extends Model {
+//   /**
+//    * Helper method for defining associations.
+//    * This method is not a part of Sequelize lifecycle.
+//    * The `models/index` file will call this method automatically.
+//    */
+//   static associate(models) {
+//     // define association here
+//   }
+// }
+// User.init({
+//   firstName: DataTypes.STRING,
+//   lastName: DataTypes.STRING,
+//   email: DataTypes.STRING
+// }, {
+//   sequelize,
+//   modelName: 'User',
+// });
+// return User;
+// };
+
+// ----------------------------------------
+import { Model, DataTypes } from 'sequelize';
+import connection from '../sequelize';
 import IUser, { Password } from '@interfaces/models/IUser';
-import { v4 as uuid } from 'uuid';
-import { injectable } from 'inversify';
 
-export type userInput = Optional<
-  IUser,
-  'id' | 'createdAt' | 'updatedAt' | 'avatar'
->;
-export type userOutput = Required<IUser>;
-
-@injectable()
 export default class User
   extends Model<userOutput, userInput>
   implements IUser
@@ -45,7 +61,8 @@ User.init(
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
-      defaultValue: uuid()
+      unique: true,
+      defaultValue: DataTypes.UUIDV4
     },
     userName: {
       type: DataTypes.STRING,
@@ -75,15 +92,13 @@ User.init(
     password: DataTypes.STRING,
     avatar: {
       type: DataTypes.STRING,
-      defaultValue: 'default.png'
+      defaultValue: 'default1.png'
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   },
   {
-    tableName: 'users',
-    freezeTableName: true,
-    timestamps: true,
-    sequelize
+    sequelize: connection,
+    timestamps: true
   }
 );
