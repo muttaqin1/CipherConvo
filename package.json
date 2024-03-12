@@ -42,6 +42,7 @@
     "lint-staged": "13.1.2",
     "morgan": "1.10.0",
     "prettier": "2.8.4",
+    "sequelize-cli": "^6.6.2",
     "supertest": "6.3.3",
     "swagger-ui-dist": "5.9.0",
     "ts-jest": "29.0.5",
@@ -52,6 +53,7 @@
     "typescript": "4.9.5"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "bcryptjs": "2.4.3",
     "cloudinary": "1.35.0",
     "compression": "1.7.4",

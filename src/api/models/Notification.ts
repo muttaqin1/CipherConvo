@@ -7,18 +7,18 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import { injectable } from 'inversify';
 import { v4 as uuid } from 'uuid';
 import { sequelize } from '@database/index';
-import User from './User';
 
-type notification_input = Optional<
-INotification,
-'createdAt' | 'updatedAt' | 'id'
+export type notification_input = Optional<
+  INotification,
+  'createdAt' | 'updatedAt' | 'id'
 >;
 type notification_output = Required<INotification>;
 
 @injectable()
 export default class Notification
   extends Model<notification_input, notification_output>
-  implements INotification {
+  implements INotification
+{
   public id!: string;
 
   public type!: NotificationType;
@@ -28,6 +28,8 @@ export default class Notification
   public sender_id!: string;
 
   public reciever_id!: string;
+
+  public notification_tab_id!: string;
 
   public title!: string;
 
@@ -57,11 +59,11 @@ Notification.init(
     },
     sender_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     reciever_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
     },
     title: {
       type: DataTypes.STRING,
@@ -80,12 +82,3 @@ Notification.init(
     sequelize
   }
 );
-
-Notification.belongsTo(User, {
-  foreignKey: 'reciever_id',
-  as: 'reciever'
-});
-Notification.belongsTo(User, {
-  foreignKey: 'sender_id',
-  as: 'sender'
-});

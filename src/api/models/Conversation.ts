@@ -2,8 +2,6 @@ import IConversation from '@interfaces/models/IConversation';
 import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '@database/index';
 import { v4 as uuid } from 'uuid';
-import Message from '@models/Message';
-import Participant from '@models/Participant';
 
 export type conversationInput = Optional<
   IConversation,
@@ -58,12 +56,3 @@ Conversation.init(
     timestamps: true
   }
 );
-
-Conversation.hasMany(Message, {
-  foreignKey: 'conversationId',
-  as: 'messages'
-});
-Conversation.hasMany(Participant, {
-  foreignKey: 'conversationId',
-  as: 'participants'
-});
